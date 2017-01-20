@@ -1,17 +1,63 @@
 body {
-  padding: 3em;
-  font-family: 'Open Sans', sans-serif;
-  font-size: 1em;
+  padding-top: 50px;
+  font-family:URW Chancery L;
+  
+}
+ul.success li, ul.info li, ul.error li{
+    margin:20px 0 20px 0;
+}
+.jumbotron {
+  background:url(../images/bg.jpg) no-repeat;
+  background-size:100%;
 }
 
-textarea {
-  resize: none;
+footer{
+    background:#f4f4f4;
+    height:40px;
+    text-align:center;
+    margin-top:30px;
+    padding-top:10px;
+    overflow:auto;
 }
 
-.inlineBlock {
- display: inline-block;
+.carousel {
+    width:100%;
+    height:300px;   
+    
 }
-
-.topAligned {
- vertical-align: top;
+.carousel-inner {
+    width:100%;
+    height:100%;
+}
+.carousel-caption {
+    position:absolute;
+    left:30px;
+    top:40px;
+    z-index:+1;
+    width:100%;
+    height:100%;
+}
+.carousel-inner > .item {
+    position:absolute;
+    left:0px;
+    top:0px;
+    width:100%;
+    height: 100%;
+    z-index:-2;
+}
+.carousel-inner > .item > img {
+    position:absolute;
+    left:0px;
+    top:0px;
+    width:100%;
+    height: 100%;
+    z-index:-1;
+}
+h3 {
+    position:absolute;
+    left:30px;
+    top:0px;
+    font-size:50px;
+    z-index:+2;
+    color:white;
 }

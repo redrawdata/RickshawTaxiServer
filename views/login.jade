@@ -1,0 +1,21 @@
+extends layout
+
+block content
+    .container
+        
+        h1 Login
+        
+        p Please Login below
+        
+        ul
+            if message
+                li.alert.alert-danger #message
+        
+        form(method='post', action='/users/login')
+            .form-group
+                label Username
+                input.form-control(name='username', type='text', placeholder='Enter Username')
+            .form-group
+                label Password
+                input.form-control(name='password', type='password', placeholder='Enter Password')
+            input.btn.btn-default(name='submit', type='submit', value='Login')
