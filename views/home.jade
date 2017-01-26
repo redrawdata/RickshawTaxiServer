@@ -1,0 +1,51 @@
+extends layout
+
+block content
+
+    .container
+        h1 Welcome to Intelligent Rickshaws Barcelona
+        
+        
+    .container
+        #carousel.carousel.slide(data-ride='carousel')
+            ol.carousel-indicators
+                li.active(data-target='#carousel', data-slide-to='0')
+                li(data-target='#carousel', data-slide-to='1')
+                li(data-target='#carousel', data-slide-to='2')
+            .carousel-inner(role='listbox')
+                .item.active
+                    img(src='images/slide1.jpg', alt='Welcome')
+                    .carousel-caption 
+                        h3 Welcome
+                        p The Home of Intelligent Rickshaws of Barcelona
+                .item
+                    img(src='images/slide2.jpg', alt='Connecting')
+                    .carousel-caption
+                        h3 Connecting
+                        p Communications for Barcelona's rickshaw community
+                .item
+                    img(src='images/slide3.jpg', alt='About Us')
+                    .carousel-caption 
+                        h3 About Us 
+                        p Developed for the rickshaw drivers of Barcelona
+            a.left.carousel-control(href='#carousel', role='button', data-slide='prev')
+                span.glyphicon.glyphicon-chevron-left(aria-hidden='true')
+                span.sr-only Previous
+            a.right.carousel-control(href='#carousel', role='button', data-slide='next')
+                span.glyphicon.glyphicon-chevron-right(aria-hidden='true')
+                span.sr-only Next
+        
+    .container
+        .row
+            .col-md-4
+                h2 About Us
+                p About Us. About Us. About Us. About Us. About Us. About Us. About Us. About Us. About Us. About Us. About Us. About Us. About Us. About Us. About Us. About Us. About Us. About Us. About Us. About Us. 
+                a.btn.btn-default(href="#") View Details
+            .col-md-4
+                h2 Services
+                p About Us. About Us. About Us. About Us. About Us. About Us. About Us. About Us. About Us. About Us. About Us. About Us. About Us. About Us. About Us. About Us. About Us. About Us. About Us. About Us.  
+                a.btn.btn-default(href="#") View Details
+            .col-md-4
+                h2 Contact Us
+                p About Us. About Us. About Us. About Us. About Us. About Us. About Us. About Us. About Us. About Us. About Us. About Us. About Us. About Us. About Us. About Us. About Us. About Us. About Us. About Us.  
+                a.btn.btn-default(href="#") View Details

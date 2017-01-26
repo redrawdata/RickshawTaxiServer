@@ -2,9 +2,12 @@ var express = require('express');
 var router = express.Router();
 var nodemailer = require('nodemailer');
 
+module.exports = router;
+
 /* GET Contact Us page */
 router.get('/', function(req, res, next) {
-  res.render('contact', {title: 'Contact Us'});
+    console.log('serving the Contact Us page');
+    res.render('contact', {title: 'Contact Us'});
 });
 
 router.post('/send', function(req,res,next){
@@ -36,4 +39,4 @@ router.post('/send', function(req,res,next){
     });
 });
 
-module.exports = router;
+

@@ -1,48 +1,71 @@
 doctype html
+
 html
-  head
-    title #{title}: Express Website
-    meta( charset="utf-8" )
-    meta( http-equiv="X-UA-Compatible", content="IE-edge" )
-    meta( name="viewport", content="width=device-width, initial-scale=1.0" )
-    link(rel='stylesheet', href='/stylesheets/bootstrap.css')
-    link(rel='stylesheet', href='/stylesheets/style.css')
-    script(src='//code.jquery.com/jquery-1.11.0.min.js')
-    script(src='/socket.io/socket.io.js')
-    script(src='/javascripts/chat.js')
-  body
-    nav.navbar.navbar-default.navbar-fixed-top
-        .container
-            .navbar-header
-                button.navbar-toggle.collapsed(type="button", data-toggle="collapse", data-target="#navbar", aria-expanded="false", aria-controls="navbar")
-                    span.sr-only Toggle Navigation
-                    span.icon-bar
-                    span.icon-bar
-                    span.icon-bar
-                a.navbar-brand(href="#") Express Website
-            #navbar.collapse.navbar-collapse
-                ul.nav.navbar-nav
-                    li(class=(title === "Home" ? "active" : ""))
-                        a(href="/") Home
-                    li(class=(title === "About" ? "active" : ""))
-                        a(href="/about") About Us
-                    li(class=(title === "Members" ? "active" : ""))
-                        a(href="/members") Members
-                    if !user
-                        li(class=(title === "Login" ? "active" : ""))
-                            a(href="/users/login") Log In
-                        li(class=(title === "Register" ? "active" : ""))
-                            a(href="/users/register") Register
-                    
-                    li(class=(title === "Contact" ? "active" : ""))
-                        a(href="/contact") Contact
-                    ul.nav.navbar-nav.navbar-right
-                    if user
-                        li
-                            a(href="/users/logout") Log Out
-                    
-    != messages()                
+
+    head
+        title Intelligent Rickshaw BCN: #{title}
+        meta( charset="utf-8" )
+        meta( http-equiv="X-UA-Compatible", content="IE-edge")
+        meta( name="viewport", content="width=device-width, initial-scale=1.0")
+        link(rel='stylesheet', href='/stylesheets/bootstrap.css')
+        link(rel='stylesheet', href='/stylesheets/style.css')
+        script(src='//code.jquery.com/jquery-1.11.0.min.js')
+        script(src='/socket.io/socket.io.js')
+        if user
+            script(src='/javascripts/chat.js')
+    body
+        nav.navbar.navbar-default.navbar-fixed-top
+            .container
+                .navbar-header
+                    button.navbar-toggle.collapsed(type="button", data-toggle="collapse", data-target="#navbar", aria-expanded="false", aria-controls="navbar")
+                        span.sr-only Toggle Navigation
+                        span.icon-bar
+                        span.icon-bar
+                        span.icon-bar
+                    a.navbar-brand(href="/") Intelligent Rickshaw BCN
+                #navbar.collapse.navbar-collapse
+                    ul.nav.navbar-nav
+                        li(class=(title === "Home" ? "active" : ""))
+                            a(href="/") Home
+                        li(class=(title === "Rickshaw Tours" ? "active" : ""))
+                            a(href="/tours") Tours
+                        li(class=(title === "Make a booking" ? "active" : ""))
+                            a(href="/bookings") Book Tour
+                        li(class=(title === "About Us" ? "active" : ""))
+                            a(href="/about") About Us
+                        if !user
+                            li(class=(title === "Register" ? "active" : ""))
+                                a(href="/register") Register
+                            li(class=(title === "Login" ? "active" : ""))
+                                a(href="/users") Log In
+                            
+                        if user
+                            li(class=(title === "Chat" ? "active" : ""))
+                                a(href="/users/chat") Chat
+                            li(class=(title === "My Account" ? "active" : ""))
+                                a(href="/users/account") My Account
+                            if user[0].access < 5
+                                li(class=(title === "Administration" ? "active" : ""))
+                                    a(href="/users/admin") Admin
+                        if !user
+                            li(class=(title === "Contact Us" ? "active" : ""))
+                                a(href="/contact") Contact
+                        ul.nav.navbar-nav.navbar-right
+                        if user
+                            li
+                                a(href="/users/logout") Log Out
+        
+        if user
+            h3 Logged in - AccessLevel: #{user[0].access}
+        if !user
+            h3 Not logged in
+        
+        if messages
+            .container                
+                != messages()
+        
     block content
+        
     footer
         p &copy; 2016 All Right Reserved
     

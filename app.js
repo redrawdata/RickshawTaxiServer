@@ -1,5 +1,6 @@
-// app.js - Awesome Chatroom
+// app.js - mysterious-river-55696
 
+// Acquired Node-Modules and set any Variables
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
@@ -19,30 +20,6 @@ var _ = require("underscore");
 var app = express();
 var http = require("http").createServer(app);
 var io = require("socket.io").listen(http);
-var participants = [];
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
-//Server's IP address
-//app.set("ipaddr", "127.0.0.1");
-
-//Server's port number
-app.set('port', process.env.PORT || 8080);
-//app.set("port", 8080);
-//http.listen(8080, "127.0.0.1");
-// uncomment after placing your favicon in /public
-//
-app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-app.use(logger('dev'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
-
-var index = require('./routes/index');
-var users = require('./routes/users');
-
-
 /*
   The list of participants in our chatroom.
   The format of each participant will be:
@@ -51,7 +28,35 @@ var users = require('./routes/users');
     name: "participantName"
   }
 */
+var participants = [];
 
+// set Routing Vaiables
+var home = require('./routes/home');
+var tours = require('./routes/tours');
+var bookings = require('./routes/bookings');
+var about = require('./routes/about');
+var register = require('./routes/register');
+var users = require('./routes/users');
+var contact = require('./routes/contact');
+var admin = require('./routes/admin');
+
+console.log('Node-Modules acquired and Variables set in app.js');
+
+// view engine setup
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'jade');
+console.log('View Engine is ' + app.get('view engine'));
+
+// set environment
+app.set('port', process.env.PORT || 8080);
+
+// setup middleware
+app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+app.use(logger('dev'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Handle Express sessions
 app.use(session({
@@ -82,17 +87,32 @@ app.use(expressValidator({
   }
 }));
 
-
 // Flash messaging
 app.use(flash());
 
+/*
+this will happen before every GET and POST request, it sets a 
+Global Variable called 'messages' which allows....
+*/
 app.use(function (req, res, next) {
-  res.locals.messages = require('express-messages')(req, res);
-  next();
+    console.log('setting Global Variable - messages');
+    res.locals.messages = require('express-messages')(req, res);
+    next();
 });
 
+/*
+this will happen before every GET request, it sets a 
+Global Variable called 'user' which allows checking of
+the 'user' state
+*/
 app.get('*', function(req,res,next){
+    console.log('setting the global Variable - user');
     res.locals.user = req.user || null;
+    console.log('Global Var - user = ' + res.locals.user);
+    if (res.locals.user){
+        console.log('userID = ' + res.locals.user.id);
+        console.log('access = ' + res.locals.user[0].access);
+    }
     next();
 });
 
@@ -103,26 +123,32 @@ app.get('*', function(req,res,next){
 //  next(err);
 //});
 
-app.use('/', index);
+app.use('/', home);
+app.use('/tours', tours);
+app.use('/bookings', bookings);
+app.use('/about', about);
+app.use('/register', register);
 app.use('/users', users);
+app.use('/contact', contact);
+app.use('/users/admin', admin);
 
 //POST method to create a chat message
 app.post("/message", function(request, response) {
     console.log('POST to /message');
-  //The request body expects a param named "message"
-  var message = request.body.message;
-    console.log(message);
-  //If the message is empty or wasn't sent it's a bad request
-  if(_.isUndefined(message) || _.isEmpty(message.trim())) {
-    return response.status(400).json({error: "Message is invalid"});
-  }
-    //We also expect the sender's name with the message
-  var name = request.body.name;
+    //The request body expects a param named "message"
+    var message = request.body.message;
+        console.log(message);
+    //If the message is empty or wasn't sent it's a bad request
+    if(_.isUndefined(message) || _.isEmpty(message.trim())) {
+        return response.status(400).json({error: "Message is invalid"});
+    }
+        //We also expect the sender's name with the message
+    var name = request.body.name;
 
-  //Let our chatroom know there was a new message
-  io.sockets.emit("incomingMessage", {message: message, name: name});
-  //Looks good, let the client know
-  response.status(200).json({message: "Message received"});
+    //Let our chatroom know there was a new message
+    io.sockets.emit("incomingMessage", {message: message, name: name});
+    //Looks good, let the client know
+    response.status(200).json({message: "Message received"});
 
 });
 
@@ -178,3 +204,5 @@ http.listen(app.get('port'), function(){
 });
 
 module.exports = app;
+module.exports = io;
+module.exports = http;
