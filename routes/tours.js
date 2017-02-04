@@ -6,7 +6,7 @@ module.exports = router;
 /* GET Tours page */
 router.get('/', function(req, res, next) {
     console.log('serving the Tours page');
-    res.render('tours', {title: 'Rickshaw Tours'});
+    res.render('tours', {title: 'Tours'});
 });
 
 

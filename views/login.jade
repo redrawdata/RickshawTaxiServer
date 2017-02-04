@@ -1,6 +1,6 @@
 extends layout
 
-block content
+block content 1
     .container
         
         h1 Login
@@ -11,7 +11,7 @@ block content
             if message
                 li.alert.alert-danger #message
         
-        form(method='post', action='/users')
+        form(method='post', action='/login')
             .form-group
                 label Username
                 input.form-control(name='username', type='text', placeholder='Enter Username')

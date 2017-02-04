@@ -7,7 +7,7 @@ module.exports = router;
 /* GET Contact Us page */
 router.get('/', function(req, res, next) {
     console.log('serving the Contact Us page');
-    res.render('contact', {title: 'Contact Us'});
+    res.render('contact', {title: 'Contact'});
 });
 
 router.post('/send', function(req,res,next){

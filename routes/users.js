@@ -22,7 +22,7 @@ router.get('/chat', ensureAuthenticated, function(req, res, next) {
 /* GET - Account page request */
 router.get('/account', ensureAuthenticated, function(req, res, next) {
     console.log('serving the Account page');
-    res.render('account', { title: 'My Account' });
+    res.location('account', { title: 'My Account' });
 });
 
 /* GET - Logout request */

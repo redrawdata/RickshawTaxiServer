@@ -13,6 +13,7 @@ html
         script(src='/socket.io/socket.io.js')
         if user
             script(src='/javascripts/chat.js')
+            
     body
         nav.navbar.navbar-default.navbar-fixed-top
             .container
@@ -27,48 +28,36 @@ html
                     ul.nav.navbar-nav
                         li(class=(title === "Home" ? "active" : ""))
                             a(href="/") Home
-                        li(class=(title === "Rickshaw Tours" ? "active" : ""))
+                        li(class=(title === "Rickshaws" ? "active" : ""))
+                            a(href="/rickshaws") Rickshaws
+                        li(class=(title === "Tours" ? "active" : ""))
                             a(href="/tours") Tours
-                        li(class=(title === "Make a booking" ? "active" : ""))
-                            a(href="/bookings") Book Tour
-                        li(class=(title === "About Us" ? "active" : ""))
+                        li(class=(title === "Bookings" ? "active" : ""))
+                            a(href="/bookings") Bookings
+                        li(class=(title === "About" ? "active" : ""))
                             a(href="/about") About Us
+                        li(class=(title === "Contact" ? "active" : ""))
+                            a(href="/contact") Contact Us
                         if !user
                             li(class=(title === "Register" ? "active" : ""))
                                 a(href="/register") Register
                             li(class=(title === "Login" ? "active" : ""))
-                                a(href="/users") Log In
-                            
+                                a(href="/login") Log In
                         if user
-                            li(class=(title === "Chat" ? "active" : ""))
-                                a(href="/users/chat") Chat
-                            li(class=(title === "My Account" ? "active" : ""))
-                                a(href="/users/account") My Account
-                            if user[0].access < 5
-                                li(class=(title === "Administration" ? "active" : ""))
-                                    a(href="/users/admin") Admin
-                        if !user
-                            li(class=(title === "Contact Us" ? "active" : ""))
-                                a(href="/contact") Contact
-                        ul.nav.navbar-nav.navbar-right
-                        if user
+                            li(class=(title === "Members" ? "active" : ""))
+                                a(href="/members") Members
                             li
-                                a(href="/users/logout") Log Out
+                                a(href="/members/logout") Log Out
         
-        if user
-            h3 Logged in - AccessLevel: #{user[0].access}
-        if !user
-            h3 Not logged in
-        
-        if messages
-            .container                
+        .container
+            if messages
                 != messages()
+            
+            block content 1
         
-    block content
+        footer
+            p &copy; 2016 All Rights Reserved
         
-    footer
-        p &copy; 2016 All Right Reserved
-    
-    script( src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js" )
-    script( src="/javascripts/bootstrap.js" )
+        script( src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js" )
+        script( src="/javascripts/bootstrap.js" )
 

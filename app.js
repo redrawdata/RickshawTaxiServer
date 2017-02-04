@@ -32,13 +32,14 @@ var participants = [];
 
 // set Routing Vaiables
 var home = require('./routes/home');
+var rickshaws = require('./routes/rickshaws');
 var tours = require('./routes/tours');
 var bookings = require('./routes/bookings');
 var about = require('./routes/about');
 var register = require('./routes/register');
-var users = require('./routes/users');
+var login = require('./routes/login');
 var contact = require('./routes/contact');
-var admin = require('./routes/admin');
+var members = require('./routes/members');
 
 console.log('Node-Modules acquired and Variables set in app.js');
 
@@ -60,7 +61,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Handle Express sessions
 app.use(session({
-    secret:'peterssecret',
+    secret:'cablecarguy',
     saveUninitialized: true,
     resave: true
 }));
@@ -124,13 +125,14 @@ app.get('*', function(req,res,next){
 //});
 
 app.use('/', home);
+app.use('/rickshaws', rickshaws);
 app.use('/tours', tours);
 app.use('/bookings', bookings);
 app.use('/about', about);
 app.use('/register', register);
-app.use('/users', users);
+app.use('/login', login);
+app.use('/members', members);
 app.use('/contact', contact);
-app.use('/users/admin', admin);
 
 //POST method to create a chat message
 app.post("/message", function(request, response) {

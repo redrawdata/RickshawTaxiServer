@@ -6,7 +6,7 @@ module.exports = router;
 /* GET About page */
 router.get('/', function(req, res, next) {
     console.log('serving the About Us page');
-    res.render('about', {title: 'About Us'});
+    res.render('about', {title: 'About'});
 });
 
 

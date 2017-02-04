@@ -1,0 +1,38 @@
+extends layout
+
+block content 1
+
+    nav.navbar
+        #navbar.collapse.navbar-collapse
+            ul.nav.navbar-nav
+                li(class=(title === "Home" ? "active" : ""))
+                    a(href="/") Home
+                li(class=(title === "Rickshaw Tours" ? "active" : ""))
+                    a(href="/tours") Tours
+                li(class=(title === "Make a booking" ? "active" : ""))
+                    a(href="/bookings") Bookings
+                li(class=(title === "About Us" ? "active" : ""))
+                    a(href="/about") About Us
+                if !user
+                    li(class=(title === "Register" ? "active" : ""))
+                        a(href="/register") Register
+                    li(class=(title === "Login" ? "active" : ""))
+                        a(href="/users") Log In
+                    
+                if user
+                    li(class=(title === "Chat" ? "active" : ""))
+                        a(href="/users/chat") Chat
+                    li(class=(title === "My Account" ? "active" : ""))
+                        a(href="/users/account") My Account
+                    if user[0].access < 5
+                        li(class=(title === "Administration" ? "active" : ""))
+                            a(href="/users/admin") Admin
+                if !user
+                    li(class=(title === "Contact Us" ? "active" : ""))
+                        a(href="/contact") Contact
+                ul.nav.navbar-nav.navbar-right
+                if user
+                    li
+                        a(href="/users/logout") Log Out
+
+    block content 2

@@ -3,6 +3,10 @@ body {
   font-family:URW Chancery L;
   
 }
+
+h1 {
+	font-size:16px;
+}
 ul.success li, ul.failure li, ul.info li, ul.error li{
     margin:20px 0 20px 0;
 }
@@ -22,7 +26,7 @@ footer{
 
 .carousel {
     width:100%;
-    height:300px;   
+    height:200px;   
     
 }
 .carousel-inner {
@@ -31,11 +35,11 @@ footer{
 }
 .carousel-caption {
     position:absolute;
-    left:30px;
-    top:40px;
+    left:0px;
+    top:0px;
     z-index:+1;
-    width:100%;
-    height:100%;
+    width:auto;
+    height:auto;
 }
 .carousel-inner > .item {
     position:absolute;
@@ -43,7 +47,7 @@ footer{
     top:0px;
     width:100%;
     height: 100%;
-    z-index:-2;
+    z-index:-3;
 }
 .carousel-inner > .item > img {
     position:absolute;
@@ -54,11 +58,39 @@ footer{
     z-index:-1;
 }
 
-.carousel-caption >  h3 {
+.carousel-caption > h3, .carousel-caption > .container > h3 {
     position:absolute;
-    left:30px;
-    top:0px;
-    font-size:50px;
+	float:center;
+	float:top;
+        width:auto;
+        padding:10px;
+    
+    
+    font-size:30px;
     z-index:+2;
     color:white;
+	background:black;
+}
+
+.carousel-caption >  p, .carousel-caption > .container > p  {
+    position:relative;
+	float:left;
+	float:top;
+    left:0px;
+    top:0px;
+    font-size:14px;
+    z-index:+2;
+    color:black;
+}
+
+.carousel-caption >  .container {
+	
+	margin:20px;    
+	position:absolute;
+	width:auto;
+        height:auto;
+    z-index:1;
+float:center;
+    background-color:black;
+	opacity:0.5;
 }
