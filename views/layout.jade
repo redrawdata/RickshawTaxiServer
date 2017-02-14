@@ -124,20 +124,21 @@ html
         .container
             if messages
                 != messages()
-            div
-            if participants
-                p There are #{participants.length} participants
-                ul.participants
+            //-
+                div
                 if participants
-                    each participant, i in participants
-                        li.alert.alert-danger #{participant.id}
-            
-            if !user
-                p You are NOT logged in
+                    p There are #{participants.length} participants
+                    ul.participants
+                    if participants
+                        each participant, i in participants
+                            li.alert.alert-danger #{participant.id}
                 
-            if user
-                p UserID: #{user.id} Name: #{user.name} #{user.surname} Username: #{user.username}  AccessLevel: #{user.access}
-            
+                if !user
+                    p You are NOT logged in
+                    
+                if user
+                    p UserID: #{user.id} Name: #{user.name} #{user.surname} Username: #{user.username}  AccessLevel: #{user.access}
+                
             block content 1
         
         footer
