@@ -4,12 +4,36 @@ block content 1
     .search-tabs-wrapper
         ul.nav.nav-tabs(role="tablist")
             li.active
+                a(href="#map" role="tab" data-toggle="tab") Map
+            li
                 a(href="#chat" role="tab" data-toggle="tab") Chat
             li
                 a(href="#profile" role="tab" data-toggle="tab") Profile
+            li
+                a(href="#account" role="tab" data-toggle="tab") Account
+            if user[0].access<5
+                li
+                    a(href="#approvals" role="tab" data-toggle="tab") Approvals
         .tab-content.search-tabs-content
-            .tab-pane.active(id="chat")
+            .tab-pane.active(id="map")
+            
+                #map
+                script.
+                    function initMap() {
+                        var barcelona = {lat: 41.398, lng: 2.158};
+                        var map = new google.maps.Map(document.getElementById('map'), {
+                            zoom: 16,
+                            center: barcelona
+                        });
+                        var marker = new google.maps.Marker({
+                            position: barcelona,
+                            map: map
+                        });
+                    }
 
+                script(async='', defer='', src='https://maps.googleapis.com/maps/api/js?key=AIzaSyCYoKrfsjvAU7lUHHVPp_vXxrpy_2bJkNw&callback=initMap')
+                
+            .tab-pane(id="chat")
                 h1 Driver Chat
                 div
                 div.inlineBlock
@@ -24,5 +48,19 @@ block content 1
                 br
                 div#participants
                 div#messages
+                
             .tab-pane(id="profile")
+                h1 My Profile
+                
+            .tab-pane(id="account")
+                h1 My Account
+                
                 accusamus et iusto odio dignissimos ducimus
+                
+            .tab-pane(id="approvals")
+                h1 Approve Access for new registrations
+                
+                A Form to view each profile
+                Navigation Buttons
+                Action Buttons
+                

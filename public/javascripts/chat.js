@@ -11,7 +11,8 @@ function init() {
 
     //We'll save our session ID in a variable for later
     var sessionId = '';
-        //Helper function to update the participants' list
+    
+    //Helper function to update the participants' list
     function updateParticipants(participants) {
         $('#participants').html('');
         for (var i = 0; i < participants.length; i++) {
@@ -19,15 +20,15 @@ function init() {
             participants[i].name + ' ' + (participants[i].id === sessionId ? '(You)' : '') + '<br /></span>');
         }
     }
+    
     /*
-    When the client successfully connects to the server, an
-    event "connect" is emitted. Let's get the session ID and
+    Client successfully connects to the server, event "connect" is emitted. Let's get the session ID and
     log it.
     */
     socket.on('connect', function () {
         sessionId = socket.io.engine.id;
-        console.log('Connected ' + sessionId);
-        console.log('emitting newUser');
+        console.log('Connected as Session: ' + sessionId);
+        console.log('emitting newUser Event to Server..');
         socket.emit('newUser', {id: sessionId, name: $('#name').val()});
     });
     /*

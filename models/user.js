@@ -24,10 +24,8 @@ function User(name, surname, nie, username, company, email, telephone, pass1, im
 }
 
 module.exports = User;
-// module.exports.getUserByUsername = function(){}
 
 module.exports.comparePassword = function (candidatePassword, hash, callback){
-    console.log('comparing passwords');
     bcrypt.compare(candidatePassword, hash, function(err, res) {
         if (err) {return callback(err);}
         return callback(null, res);
@@ -44,7 +42,7 @@ module.exports.insertUser = function (newUser, callback){
                 var hashedPass = hash;
                 client.query("INSERT INTO public.members(name, surname, nie, username, company, email, telephone, password, image, regdate, lastseen, isapproved, issuspended, access) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)", [newUser.name, newUser.surname, newUser.nie, newUser.username, newUser.company, newUser.email, newUser.telephone, hashedPass, newUser.image, newUser.regDate, newUser.lastSeen, newUser.isApproved, newUser.isSuspended, newUser.access], function(err, result){
                     if (err){return callback(err);}
-                    console.log('/tnew Member added to database');
+                    console.log('new Member added to database');
                     return callback(null, result);
                 });
             });
@@ -70,8 +68,20 @@ module.exports.getUserByUsername = function (username, callback){
         if (error) {return callback(error);}
         var sql = "(SELECT * FROM public.members WHERE LOWER(username) = LOWER('" + username + "'))";
         var query = client.query(sql, function(err, result){
-            if(err){return callback(err);}
-            return callback(null, result);
+            if(err){
+                return callback(err);
+            }
+            if (result.rowCount == 0){
+                return callback(null, null);
+            }
+            if (result.rowCount == 1){
+                var user = JSON.stringify(result.rows, null, '    ');
+                user = JSON.parse(user);
+                return callback(null, user);
+            }
+            // THIS SHOULD NOT HAPPEN - THERE IS USERNAME DUPLICATION
+            console.log('DB error - duplication in Username field');
+            return callback(null, null);
         });
     });
 };

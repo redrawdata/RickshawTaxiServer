@@ -13,17 +13,89 @@ html
         script(src='/socket.io/socket.io.js')
         if user
             script(src='/javascripts/chat.js')
+        script.
+        
+            function startTimeAndPostLocation() {
+                startTime();
+                getLocation();
             
-    body
+            }
+            
+            
+            
+            function startTime(){
+                var today = new Date();
+                var h = today.getHours();
+                var m = today.getMinutes();
+                var s = today.getSeconds();
+                m = checkTime(m);
+                s = checkTime(s);
+                document.getElementById('clock').innerHTML = h + ":" + m + ":" + s;
+                var t = setTimeout(startTime, 500);
+            }
+            
+            
+
+            function getLocation() {
+                
+                console.log("fetching location...");
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(showPosition, showError);
+                } 
+                else { 
+                    x.innerHTML = "Geolocation is not supported by this browser.";
+                }
+            }
+
+            function showPosition(position) {
+                var x = document.getElementById("lat/lng");
+                x.innerHTML = "Latitude: " + position.coords.latitude + 
+                " Longitude: " + position.coords.longitude;
+                $.post("/allpositions", {
+                    name: "Donald",
+                    position: position
+                    }, function(response){
+                        console.log(response);
+                        
+                        //- alert("Response: " + response);
+                    }
+                );
+            }
+
+
+            function showError(error) {
+                switch(error.code) {
+                    case error.PERMISSION_DENIED:
+                        x.innerHTML = "User denied the request for Geolocation."
+                        break;
+                    case error.POSITION_UNAVAILABLE:
+                        x.innerHTML = "Location information is unavailable."
+                        break;
+                    case error.TIMEOUT:
+                        x.innerHTML = "The request to get user location timed out."
+                        break;
+                    case error.UNKNOWN_ERROR:
+                        x.innerHTML = "An unknown error occurred."
+                        break;
+                }
+            }
+            function checkTime(i) {
+                if (i < 10) {i = "0" + i};  // add zero in front of numbers < 10
+                return i;
+            }
+
+    body(onload="startTimeAndPostLocation()")
         nav.navbar.navbar-default.navbar-fixed-top
             .container
                 .navbar-header
                     button.navbar-toggle.collapsed(type="button", data-toggle="collapse", data-target="#navbar", aria-expanded="false", aria-controls="navbar")
-                        span.sr-only Toggle Navigation
-                        span.icon-bar
-                        span.icon-bar
-                        span.icon-bar
-                    a.navbar-brand(href="/") Intelligent Rickshaw BCN
+                    span.sr-only Toggle Navigation
+                    span.icon-bar
+                    span.icon-bar
+                    span.icon-bar
+                    a.navbar-left(href='/')
+                        img(id="logo" src="/images/InteligentBCNlogo.png")
+                    //- a.navbar-brand(href="/") Intelligent Rickshaw BCN
                 #navbar.collapse.navbar-collapse
                     ul.nav.navbar-nav
                         li(class=(title === "Home" ? "active" : ""))
@@ -52,12 +124,29 @@ html
         .container
             if messages
                 != messages()
+            div
+            if participants
+                p There are #{participants.length} participants
+                ul.participants
+                if participants
+                    each participant, i in participants
+                        li.alert.alert-danger #{participant.id}
+            
+            if !user
+                p You are NOT logged in
+                
+            if user
+                p UserID: #{user.id} Name: #{user.name} #{user.surname} Username: #{user.username}  AccessLevel: #{user.access}
             
             block content 1
         
         footer
             p &copy; 2016 All Rights Reserved
-        
+            div(id="clock")
+            button(onclick="getLocation()") Get Location
+            p(id="lat/lng")
+            
         script( src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js" )
         script( src="/javascripts/bootstrap.js" )
+        script ( src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCYoKrfsjvAU7lUHHVPp_vXxrpy_2bJkNw&callback=initMap" )
 

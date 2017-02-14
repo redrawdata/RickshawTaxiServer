@@ -65,7 +65,7 @@ router.post('/', passport.authenticate('local',{failureRedirect:'/users', failur
 });
 
 passport.serializeUser(function(user, done) {
-    console.log('serializing User');
+    console.log('serializing User !!!');
     done(null, user.id);
 });
 

@@ -1,11 +1,24 @@
 var express = require('express');
 var router = express.Router();
+var onlineUsers = require('../app');
+
+module.exports = router;
 var http = require("http").createServer(router);
 var io = require("socket.io").listen(http);
 
 /* GET Members page. */
 router.get('/', ensureAuthenticated, function(req, res, next) {
-  res.render('members', { title: 'Members' });
+    // create any variables
+    console.log('serving the members page');
+    res.render('members', { title: 'Members'});
+});
+
+/* GET - Logout request */
+router.get('/logout', ensureAuthenticated, function(req, res, next){
+    console.log('logging out the user');
+    req.logout();
+    req.flash('success','you have logged out');
+    res.redirect('/login');
 });
 
 //POST method to create a chat message
@@ -30,11 +43,13 @@ router.post("/message", function(request, response) {
 
 
 function ensureAuthenticated(req, res, next){
+    console.log('seeking Authority for access to Members Page...');
     if(req.isAuthenticated()){
+        console.log('   granted');
         return next();
     }
+    console.log('   denied - redirectiog to Login Page');
     res.redirect('/login');
 }
 
 
-module.exports = router;

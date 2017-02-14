@@ -30,6 +30,17 @@ var io = require("socket.io").listen(http);
 */
 var participants = [];
 
+// add a Participant - just for testing purposes
+participants.push({
+    id: '1111111111', 
+    name: 'fake',
+    surname: 'member',
+    nie: 'Y1234567X',
+    lat: '41.408',
+    lng: '2.17'
+});
+
+
 // set Routing Vaiables
 var home = require('./routes/home');
 var rickshaws = require('./routes/rickshaws');
@@ -40,13 +51,16 @@ var register = require('./routes/register');
 var login = require('./routes/login');
 var contact = require('./routes/contact');
 var members = require('./routes/members');
+var admin = require('./routes/admin');
+var coords = require('./routes/coords');
 
 console.log('Node-Modules acquired and Variables set in app.js');
+console.log('   Online Total = ' + participants.length);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
-console.log('View Engine is ' + app.get('view engine'));
+console.log('   View Engine is ' + app.get('view engine'));
 
 // set environment
 app.set('port', process.env.PORT || 8080);
@@ -106,13 +120,22 @@ this will happen before every GET request, it sets a
 Global Variable called 'user' which allows checking of
 the 'user' state
 */
-app.get('*', function(req,res,next){
-    console.log('setting the global Variable - user');
+app.get('*', function (req, res, next){
+    console.log('setting Global Variables');
+    res.locals.participants = participants;
     res.locals.user = req.user || null;
-    console.log('Global Var - user = ' + res.locals.user);
+    for (i = 0; i < res.locals.participants.length; i++){
+        console.log('   Participant No:' + i + '   ID: ' + res.locals.participants[i].id + '    Name: ' + res.locals.participants[i].name)
+    }
     if (res.locals.user){
-        console.log('userID = ' + res.locals.user.id);
-        console.log('access = ' + res.locals.user[0].access);
+        console.log('   userID = ' + res.locals.user.id + 
+                    ' UserFullName = ' + res.locals.user[0].name + 
+                    ' ' + res.locals.user[0].surname +   
+                    ' Username = ' + res.locals.user[0].username + 
+                    ' UserAccess = ' + res.locals.user[0].access);
+    }
+    else {
+        console.log('   No User Info');
     }
     next();
 });
@@ -133,6 +156,8 @@ app.use('/register', register);
 app.use('/login', login);
 app.use('/members', members);
 app.use('/contact', contact);
+app.use('/admin', admin);
+app.use('/allpositions', coords);
 
 //POST method to create a chat message
 app.post("/message", function(request, response) {
@@ -154,9 +179,10 @@ app.post("/message", function(request, response) {
 
 });
 
+// Handler for Socket.IO events
 /* Socket.IO events */
 io.on("connection", function(socket){
-    console.log('connection occurred');
+    console.log('A connection has occurred (logged by app.js)');
     /*
         When a new user connects to our server, we expect an event called "newUser"
         and then we'll emit an event called "newConnection" with a list of all
@@ -202,7 +228,7 @@ app.use(function(err, req, res, next) {
 
 //Start the http server at port and IP defined before
 http.listen(app.get('port'), function(){
-    console.log('listening on port: ' + app.get('port'));
+    console.log('   listening on port: ' + app.get('port'));
 });
 
 module.exports = app;
