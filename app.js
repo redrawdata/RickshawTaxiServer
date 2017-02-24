@@ -20,27 +20,67 @@ var _ = require("underscore");
 var app = express();
 var http = require("http").createServer(app);
 var io = require("socket.io").listen(http);
+
 /*
   The list of participants in our chatroom.
   The format of each participant will be:
   {
-    id: "sessionId",
-    name: "participantName"
+    id:         "sessionId",
+    name:       "participantName",
+    surname:    "surname",
+    username:   "username",
+    company:    "company",
+    
+    
   }
 */
 var participants = [];
 
 // add a Participant - just for testing purposes
 participants.push({
-    id: '1111111111', 
-    name: 'fake',
-    surname: 'member',
-    nie: 'Y1234567X',
-    lat: '41.408',
-    lng: '2.17'
+    id:         'fake sessionId1', 
+    name:       'fake1',
+    surname:    'member1',
+    username:   'Fake 1',
+    company:    'IBCN',
+    nie:        'Y1234567X',
+    lat:        '41.408',
+    lng:        '2.17',
+    onRide:     'false'
 });
-
-
+participants.push({
+    id:         'fake sessionId2', 
+    name:       'earthquake',
+    surname:    'shaker',
+    username:   'Quaker',
+    company:    'IBCN',
+    nie:        'Y1234945X',
+    lat:        '41.4081',
+    lng:        '2.171',
+    onRide:     'false'
+});
+participants.push({
+    id:         'fake sessionId3', 
+    name:       'fake3',
+    surname:    'member3',
+    username:   'Fake 3',
+    company:    'IBCN',
+    nie:        'Y1234567X',
+    lat:        '41.408',
+    lng:        '2.171',
+    onRide:     'false'
+});
+participants.push({
+    id:         'fake sessionId4', 
+    name:       'earthquake2',
+    surname:    'shaker2',
+    username:   'Quaker2',
+    company:    'IBCN',
+    nie:        'Y1234945X',
+    lat:        '41.4081',
+    lng:        '2.17',
+    onRide:     'false'
+});
 // set Routing Vaiables
 var home = require('./routes/home');
 var rickshaws = require('./routes/rickshaws');
@@ -122,10 +162,11 @@ the 'user' state
 */
 app.get('*', function (req, res, next){
     console.log('setting Global Variables');
+    console.log('Participants currently: ' + participants);
     res.locals.participants = participants;
     res.locals.user = req.user || null;
     for (i = 0; i < res.locals.participants.length; i++){
-        console.log('   Participant No:' + i + '   ID: ' + res.locals.participants[i].id + '    Name: ' + res.locals.participants[i].name)
+        console.log('   Participant No:' + i + '   ID: ' + res.locals.participants[i].id + '    Name: ' + res.locals.participants[i].name);
     }
     if (res.locals.user){
         console.log('   userID = ' + res.locals.user.id + 
@@ -161,7 +202,7 @@ app.use('/allpositions', coords);
 
 //POST method to create a chat message
 app.post("/message", function(request, response) {
-    console.log('POST to /message');
+    console.log('POST to /message - app.js');
     //The request body expects a param named "message"
     var message = request.body.message;
         console.log(message);
@@ -172,7 +213,7 @@ app.post("/message", function(request, response) {
         //We also expect the sender's name with the message
     var name = request.body.name;
 
-    //Let our chatroom know there was a new message
+    //Emit the new message to all Participants (.sockets)
     io.sockets.emit("incomingMessage", {message: message, name: name});
     //Looks good, let the client know
     response.status(200).json({message: "Message received"});
@@ -180,16 +221,35 @@ app.post("/message", function(request, response) {
 });
 
 // Handler for Socket.IO events
-/* Socket.IO events */
+
+/* Connection event - occurs when the User(Client) becomes a 'live' User
+    by attempting a socket.io connection to the Server*/
 io.on("connection", function(socket){
     console.log('A connection has occurred (logged by app.js)');
+    
+    //Helper function to console.log the current Participants
+    function logParticipants(){
+        console.log('Current Participants');
+        for(i=0; i<participants.length; i++){
+            console.log('   ' + participants[i].username);
+        }
+    }
     /*
-        When a new user connects to our server, we expect an event called "newUser"
-        and then we'll emit an event called "newConnection" with a list of all
+        After connecting to the Server the Client will emit a "newUser" event,
+        this will allow the Server to update the Participants' list,
+        adding the User data and deleting duplicate Users' data...
+        then we'll emit an event called "newConnection" with a list of all
         participants to all connected clients
     */
     socket.on("newUser", function(data) {
-        participants.push({id: data.id, name: data.name});
+        console.log('Server notified of a newUser...');
+        // add the newUser to the Participants list
+        participants.push({ id:         data.id,
+                            name:       data.name,
+                            surname:    data.surname,
+                            username:   data.username
+        });
+        // 
         io.sockets.emit("newConnection", {participants: participants});
   });
 
@@ -206,7 +266,7 @@ io.on("connection", function(socket){
   /*
     When a client disconnects from the server, the event "disconnect" is automatically
     captured by the server. It will then emit an event called "userDisconnected" to
-    all participants with the id of the client that disconnected
+    all participants, with the id of the client that disconnected
   */
   socket.on("disconnect", function() {
     participants = _.without(participants,_.findWhere(participants, {id: socket.id}));

@@ -1,16 +1,22 @@
 var express = require('express');
 var router = express.Router();
 var onlineUsers = require('../app');
-
-module.exports = router;
 var http = require("http").createServer(router);
 var io = require("socket.io").listen(http);
+
+module.exports = router;
 
 /* GET Members page. */
 router.get('/', ensureAuthenticated, function(req, res, next) {
     // create any variables
     console.log('serving the members page');
-    res.render('members', { title: 'Members'});
+    console.log('Participants = ' + res.locals.participants.length);
+    for (i=0; i < res.locals.participants.length; i++){
+        console.log('Participant ' + i + ' is ' + res.locals.participants[i].name);
+    }
+    res.render('members', { 
+                            title: 'Members'
+    });
 });
 
 /* GET - Logout request */

@@ -3,10 +3,11 @@ var bcrypt = require('bcrypt');
 const saltRounds = 10;
 const myPassword = 'the quick brown fox';
 const anotherPassword = 'secretsquirrel';
-var connect = 'postgres://uwjxdttsjukuaf:iy3dxdHuLJS2WQesI2Uo8odQBw@ec2-54-221-246-85.compute-1.amazonaws.com:5432/d3rjtprcvt17fs';
+var connect = 'postgres://pnfhritadoduvm:f73a4bd09f6e8e082106c675792a88519f64bc290c7c9c2b5e40511cfdedfa91@ec2-54-235-245-255.compute-1.amazonaws.com:5432/d1mboisolqqr3t';
 pg.defaults.ssl = true;
 
-function User(name, surname, nie, username, company, email, telephone, pass1, image, lastSeen, regDate, isApproved, isSuspended, access){
+function User(memberNo, name, surname, nie, username, company, email, telephone, pass1, image, lastSeen, regDate, isApproved, isSuspended, access){
+    this.id=memberNo;
     this.name=name;
     this.surname=surname;
     this.nie=nie;
@@ -32,10 +33,13 @@ module.exports.comparePassword = function (candidatePassword, hash, callback){
     });
 }
 
+
 module.exports.insertUser = function (newUser, callback){
     //create the connection to the database, then process the error or returned client
     pg.connect(connect, function(error, client) {
-        if (error) {return callback(error);}
+        if (error) {
+            console.log('!!! error trying to connnect to database !!!');
+            return callback(error);}
         // hash the password
         bcrypt.genSalt (saltRounds, function (err, salt) {
             bcrypt.hash(newUser.password, salt, function(err, hash) {
@@ -65,9 +69,12 @@ module.exports.getUserByNie = function (nie, callback){
 // returns record which matches a given Username
 module.exports.getUserByUsername = function (username, callback){
     pg.connect(connect, function(error, client) {
-        if (error) {return callback(error);}
+        if (error) {
+            return callback(error);
+        }
         var sql = "(SELECT * FROM public.members WHERE LOWER(username) = LOWER('" + username + "'))";
         var query = client.query(sql, function(err, result){
+            client.end();
             if(err){
                 return callback(err);
             }
@@ -92,6 +99,7 @@ module.exports.getUserById = function (id, callback){
         if (error) {return callback(error);}
         var sql = "(SELECT * FROM public.members WHERE memberno = '" + id + "')";
         var query = client.query(sql, function(err, result){
+            client.end();
             if(err){return callback(err);}
             var user = JSON.stringify(result.rows, null, '    ');
             user = JSON.parse(user);

@@ -1,21 +1,30 @@
-//
+// login.js = Routing for Login page
 
 var express = require('express');
 var bodyParser = require('body-parser');
 var router = express.Router();
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
-var User = require('../models/user');
+var User = require('../models/user'); // not used at moment
 
 module.exports = router;
 
 /* GET - Login page request */
-router.get('/', function(req, res, next) {
+router.get('/', ensureNotLoggedIn, function(req, res, next) {
     console.log('serving the Login page');
     res.render('login', { title: 'Login' });
 });
 
-
+function ensureNotLoggedIn(req, res, next){
+    console.log('checking if already logged in...');
+    if(req.isAuthenticated()){
+        console.log('User is already logged in, redirecting to Members Area...');
+        res.redirect('/members');
+        return(false);
+    }
+    console.log('not logged in - allowing access to Login Page');
+    return next();
+}
 /*  POST - User submits a Login form
     --------------------------------
     Login credentials authenticated with Passportjs

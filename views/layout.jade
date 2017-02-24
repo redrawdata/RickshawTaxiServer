@@ -12,9 +12,10 @@ html
         script(src='//code.jquery.com/jquery-1.11.0.min.js')
         script(src='/socket.io/socket.io.js')
         if user
-            script(src='/javascripts/chat.js')
+            //script(src='/javascripts/chat.js')
         script.
-        
+            console.log("Location and Time functionality attached");
+            var participants = !{JSON.stringify(participants)};
             function startTimeAndPostLocation() {
                 startTime();
                 getLocation();
@@ -33,6 +34,8 @@ html
                 document.getElementById('clock').innerHTML = h + ":" + m + ":" + s;
                 var t = setTimeout(startTime, 500);
             }
+            
+                
             
             
 
@@ -72,7 +75,7 @@ html
                         x.innerHTML = "Location information is unavailable."
                         break;
                     case error.TIMEOUT:
-                        x.innerHTML = "The request to get user location timed out."
+                        x.innerHTML = "The request to get user location timed out."    
                         break;
                     case error.UNKNOWN_ERROR:
                         x.innerHTML = "An unknown error occurred."
@@ -86,13 +89,13 @@ html
 
     body(onload="startTimeAndPostLocation()")
         nav.navbar.navbar-default.navbar-fixed-top
-            .container
+            .div
                 .navbar-header
                     button.navbar-toggle.collapsed(type="button", data-toggle="collapse", data-target="#navbar", aria-expanded="false", aria-controls="navbar")
-                    span.sr-only Toggle Navigation
-                    span.icon-bar
-                    span.icon-bar
-                    span.icon-bar
+                        span.sr-only Toggle Navigation
+                        span.icon-bar
+                        span.icon-bar
+                        span.icon-bar
                     a.navbar-left(href='/')
                         img(id="logo" src="/images/InteligentBCNlogo.png")
                     //- a.navbar-brand(href="/") Intelligent Rickshaw BCN
@@ -125,20 +128,20 @@ html
             if messages
                 != messages()
             //-
-                div
+            div
+            if participants
+                p There are #{participants.length} participants
                 if participants
-                    p There are #{participants.length} participants
-                    ul.participants
-                    if participants
-                        each participant, i in participants
-                            li.alert.alert-danger #{participant.id}
+                    each participant, i in participants
+                        li.alert.alert-danger #{participant.id} , #{participant.username}
+                            
+            if !user
+                p You are NOT logged in
                 
-                if !user
-                    p You are NOT logged in
-                    
-                if user
-                    p UserID: #{user.id} Name: #{user.name} #{user.surname} Username: #{user.username}  AccessLevel: #{user.access}
-                
+            if user
+                p UserID: #{user.id} Name: #{user[0].name} #{user[0].surname} Username: #{user[0].username}  AccessLevel: #{user[0].access}
+            
+        
             block content 1
         
         footer

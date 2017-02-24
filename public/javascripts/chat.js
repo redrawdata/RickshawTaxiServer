@@ -1,42 +1,56 @@
 function init() {
 
     var serverBaseUrl = document.domain;
-    console.log('chat.js init occurred....');
+    console.log('chat.js - init occurred....');
     /*
-    On client init, try to connect to the socket.IO server.
-    Note we don't specify a port since we set up our server
-    to run on port 8080
+    On 'init' we make a connection to the socket.IO server.
+    Note Port of Server is 8080 and does not need to be set here
     */
+    
+    console.log('chat.js - connecting to server');
     var socket = io.connect(serverBaseUrl);
 
-    //We'll save our session ID in a variable for later
+    //create a 'sessionID' variable for later use
     var sessionId = '';
     
-    //Helper function to update the participants' list
+    //Helper function - updates the Participants' list in the browser
     function updateParticipants(participants) {
+        // clear the Participants list in the browser
         $('#participants').html('');
+        // loop through each Participant and append a Span, their Name and (if the sessionId's match) the word 'You'
         for (var i = 0; i < participants.length; i++) {
             $('#participants').append('<span id="' + participants[i].id + '">' +
             participants[i].name + ' ' + (participants[i].id === sessionId ? '(You)' : '') + '<br /></span>');
         }
+        console.log('chat.js - Participants updated in browser');
     }
     
     /*
-    Client successfully connects to the server, event "connect" is emitted. Let's get the session ID and
-    log it.
+    When the Client successfully connects to the server, event "connect" is triggered.... here we have the opportunity to send a 'newUser' event to the Server and provide all relevant data of the Client
     */
     socket.on('connect', function () {
+        // set the 'sessionId'
         sessionId = socket.io.engine.id;
-        console.log('Connected as Session: ' + sessionId);
-        console.log('emitting newUser Event to Server..');
-        socket.emit('newUser', {id: sessionId, name: $('#name').val()});
+        console.log('chat.js - Connected as Session: ' + sessionId);
+        console.log('chat.js - emitting newUser Event to Server..');
+        
+        socket.emit('newUser', {id:         sessionId, 
+                                name:       $('#name').val(),
+                                surname:    $('#surname').val(),
+                                username:   $('#username').val()
+                                // lat and lng
+        });
     });
+    
+    
     /*
     When the server emits the "newConnection" event, we'll reset
     the participants section and display the connected clients.
     Note we are assigning the sessionId as the span ID.
     */
-    socket.on('newConnection', function (data) {    
+    socket.on('newConnection', function (data) {
+        console.log('chat.js - newConnection');
+        console.log('chat.js - updating Participants');
         updateParticipants(data.participants);
     });
 

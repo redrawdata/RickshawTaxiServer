@@ -20,47 +20,75 @@ block content 1
                 #map
                 script.
                     function initMap() {
+                        //var participants = #{participants};
                         var barcelona = {lat: 41.398, lng: 2.158};
                         var map = new google.maps.Map(document.getElementById('map'), {
                             zoom: 16,
                             center: barcelona
                         });
-                        var marker = new google.maps.Marker({
-                            position: barcelona,
-                            map: map
-                        });
+                        console.log('map created');
+                        console.log('counting participants...');
+                        var bounds = new google.maps.LatLngBounds();
+                        var markers = new Array();
+                        for(i=0; i < participants.length; i++){
+                            var aLatLng = new google.maps.LatLng(participants[i].lat, participants[i].lng);
+                            markers[i] = new google.maps.Marker({position: aLatLng,map: map});
+                            bounds.extend(aLatLng);
+                            console.log(participants[i].name);
+                        }
+                        map.fitBounds(bounds);
                     }
-
-                script(async='', defer='', src='https://maps.googleapis.com/maps/api/js?key=AIzaSyCYoKrfsjvAU7lUHHVPp_vXxrpy_2bJkNw&callback=initMap')
-                
+                    
+                script(async='',defer='',src='https://maps.googleapis.com/maps/api/js?key=AIzaSyCYoKrfsjvAU7lUHHVPp_vXxrpy_2bJkNw&callback=initMap')
             .tab-pane(id="chat")
                 h1 Driver Chat
-                div
-                div.inlineBlock
-                    span Your name:
-                    input(type="text", value="Anonymous")#name
-                    br
-                    form#messageForm
-                    textarea(rows="4", cols="50", placeholder="Share something!", maxlength=200)#outgoingMessage
-                    input(type="button", value="Share", disabled=true)#send
-                div.inlineBlock.topAligned
-                b Participants
-                br
-                div#participants
-                div#messages
+                span Your name:
+                    input(type="text", value="#{user[0].username}")#name
+                .div(id="messagesAndParts")
+                    .div(id="chatMessages")
+                        #messages
+                    .div(id="chatParticipants")
+                        b Participants
+                        if participants
+                            each participant, i in participants
+                                p #{participant.username}
+                        #participants
+                form#messageForm
+                    div(id="chatOut")
+                    div(id="sendButton")
+                    span
+                        textarea(rows="1", cols="50", placeholder="Share something!", maxlength=200)#outgoingMessage
+                        input(type="button", value="Share", disabled=true)#send
+                
                 
             .tab-pane(id="profile")
                 h1 My Profile
                 
             .tab-pane(id="account")
                 h1 My Account
-                
-                accusamus et iusto odio dignissimos ducimus
-                
+                .panel.panel-primary
+                    .panel-heading Change password....
+                    .panel-body
+                        form(method='post', action='members/passwordChange')
+                            .form-group
+                                label Current Password
+                                input.form-control(name='currentPassword', type='password', placeholder='Enter Current Username')
+                            .form-group
+                                label New Password
+                                input.form-control(name='newPassword1', type='password', placeholder='Enter New Password')
+                            .form-group
+                                label Confirm New Password
+                                input.form-control(name='newPassword2', type='password', placeholder='Confirm New Password')
+                            input.btn.btn-default(name='submitNewPassword', type='submit', value='Set New Password')
+                div
+                    p Option 2
+                div
+                    p Option 3
+                    
             .tab-pane(id="approvals")
                 h1 Approve Access for new registrations
                 
-                A Form to view each profile
+                Form to view each profile
                 Navigation Buttons
                 Action Buttons
                 

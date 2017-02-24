@@ -6390,32 +6390,29 @@ button.close {
 }
 .carousel-indicators {
   position: absolute;
-  bottom: 10px;
-  left: 50%;
+  bottom: 0px;
   z-index: 15;
-  width: 60%;
+  width: 100%;
   padding-left: 0;
-  margin-left: -30%;
   text-align: center;
   list-style: none;
+margin-bottom:0px;
 }
 .carousel-indicators li {
   display: inline-block;
-  width: 10px;
-  height: 10px;
-  margin: 1px;
+  width: 15px;
+  height: 15px;
+  margin: 5px;
   text-indent: -999px;
   cursor: pointer;
-  background-color: #000 \9;
-  background-color: rgba(0, 0, 0, 0);
-  border: 1px solid #fff;
-  border-radius: 10px;
+  background-color: rgba(255, 255, 0, 1);
+  border: 3px solid #f00;
+  border-radius: 5px;
 }
 .carousel-indicators .active {
-  width: 12px;
-  height: 12px;
-  margin: 0;
-  background-color: #fff;
+  width: 18px;
+  height: 18px;
+  background-color: #00f;
 }
 .carousel-caption {
   position: absolute;
@@ -6456,7 +6453,7 @@ button.close {
     padding-bottom: 30px;
   }
   .carousel-indicators {
-    bottom: 20px;
+    /*! bottom: 20px; */
   }
 }
 .clearfix:before,
