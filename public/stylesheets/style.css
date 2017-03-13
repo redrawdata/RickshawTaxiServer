@@ -9,7 +9,8 @@ body {
 }
 
 h1 {
-	font-size:16px;
+    margin-top:0px;
+    
 }
 
 ul.success li, ul.failure li, ul.info li, ul.error li{
@@ -17,7 +18,7 @@ ul.success li, ul.failure li, ul.info li, ul.error li{
 }
 
 .jumbotron {
-  background:url(../images/bg.jpg) no-repeat;
+  /*background:url(../images/bg.jpg) no-repeat;*/
   background-size:100%;
 border:3px;
 border-color:black;
@@ -55,6 +56,17 @@ border:3px solid black;
 margin:0px;
 padding:0px:
 }
+#jumboDrivers{
+padding:0px;
+}
+
+#jumboDrivers > .row{
+    position:relative;
+    padding:0px;
+    width:100%;
+    border:3px solid red;
+    margin:0px;
+}
 
 #jumboTrixi{
   background:yellow;
@@ -77,12 +89,25 @@ border-radius:20px;
 border-radius:20px;
 }
 #jumboH1 {
-  color:white;
-height:50%;
+margin:10px;
+padding:0px;
+color:black;
+ width:100%; 
 border:3px solid black;
+text-align:center;
+padding-bottom:8px;
 
 }
+#jumboImg {
+max-width:100%;
+height:100%;
+border:3px solid black;
+margin:0px;
+margin-top:10px;
+margin-bottom:10px;
+display:block;
 
+}
 #messagesAndParts{
 width:100%;
 padding:0px;
@@ -110,6 +135,23 @@ height:30px;
     display:table-cell;
 border:3px solid black;
 }
+
+#photo{
+    width:100%;
+    height:100%;
+}
+.media{
+    background:#f4f4f4;
+}
+.media-left, .media-body{
+    padding:10px;
+}
+
+img.media-object{
+    max-width:75px;
+    
+}
+
 footer{
     background:#f4f4f4;
     height:auto;
@@ -124,6 +166,12 @@ footer{
     height:300px;   
     
 }
+
+.carousel-caption {
+    width:auto;
+    right:0;
+    top:20px;
+}
 .carousel > .carousel-inner {
     height:100%;
 }
@@ -135,13 +183,13 @@ footer{
 }
 
 #cap_h3 {
-    position:absolute;
+    position:relative;
     padding-left: 15px;
     padding-right: 19px;
     padding-bottom: 7px;
     padding-top: 2px;
-    left: 37%;
-    top: 12px;
+    
+    
     font-size:40px;
     z-index:+2;
     color:white;

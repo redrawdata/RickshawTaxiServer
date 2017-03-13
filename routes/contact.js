@@ -5,12 +5,12 @@ var nodemailer = require('nodemailer');
 module.exports = router;
 
 /* GET Contact Us page */
-router.get('/', function(req, res, next) {
+router.get('/', function(req, res) {
     console.log('serving the Contact Us page');
     res.render('contact', {title: 'Contact'});
 });
 
-router.post('/send', function(req,res,next){
+router.post('/send', function(req, res){
     var transporter = nodemailer.createTransport({
         service: 'Gmail',
         auth: {

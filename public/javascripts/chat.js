@@ -1,13 +1,16 @@
-function init() {
+const ID = '(chat.js) ';
 
+function init() {
+    console.log(ID+'Init occurred....');
+    console.log(ID+'Reading ServerBaseURL for connection');
     var serverBaseUrl = document.domain;
-    console.log('chat.js - init occurred....');
+    var markers = [];
     /*
     On 'init' we make a connection to the socket.IO server.
     Note Port of Server is 8080 and does not need to be set here
     */
     
-    console.log('chat.js - connecting to server');
+    console.log(ID+'Connecting to server');
     var socket = io.connect(serverBaseUrl);
 
     //create a 'sessionID' variable for later use
@@ -20,7 +23,7 @@ function init() {
         // loop through each Participant and append a Span, their Name and (if the sessionId's match) the word 'You'
         for (var i = 0; i < participants.length; i++) {
             $('#participants').append('<span id="' + participants[i].id + '">' +
-            participants[i].name + ' ' + (participants[i].id === sessionId ? '(You)' : '') + '<br /></span>');
+            participants[i].username + ' ' + (participants[i].id === sessionId ? '(You)' : '') + '<br /></span>');
         }
         console.log('chat.js - Participants updated in browser');
     }
@@ -31,13 +34,18 @@ function init() {
     socket.on('connect', function () {
         // set the 'sessionId'
         sessionId = socket.io.engine.id;
-        console.log('chat.js - Connected as Session: ' + sessionId);
-        console.log('chat.js - emitting newUser Event to Server..');
+        console.log(ID+'Connected as Session: ' + sessionId);
+        console.log(ID+'emitting newUser Event to Server..');
         
-        socket.emit('newUser', {id:         sessionId, 
-                                name:       $('#name').val(),
-                                surname:    $('#surname').val(),
-                                username:   $('#username').val()
+        socket.emit('newUser', {id:         sessionId,
+                                memberID:   user.id,
+                                name:       user.name,
+                                surname:    user.surname,
+                                username:   user.username,
+                                company:    user.company,
+                                lat:        null,
+                                lng:        null,
+                                onRide:     'false'
                                 // lat and lng
         });
     });
@@ -52,6 +60,10 @@ function init() {
         console.log('chat.js - newConnection');
         console.log('chat.js - updating Participants');
         updateParticipants(data.participants);
+        // run test function
+        addMarkers(data.participants);
+        
+        
     });
 
     /*
@@ -69,7 +81,22 @@ function init() {
     socket.on('nameChanged', function (data) {
         $('#' + data.id).html(data.name + ' ' + (data.id === sessionId ? '(You)' : '') + '<br />');
     });
+    
+    
+    /*
+    When receiving a new coordinates message with the "incomingCoords" event,
+    Update the Map Marker[id]
+    */
+    socket.on('incomingCoords', function (data) {
+        var lat = data.lat;
+        var lng = data.lng;
+        var id = data.id;
+        console.log('new member coords received');
+        adjustMarkers(lat, lng, id);
+        //$('#messages').prepend('<b>' + name + '</b><br />' + message + '<hr />');
+    });
 
+    
     /*
     When receiving a new chat message with the "incomingMessage" event,
     we'll prepend it to the messages section
@@ -104,12 +131,29 @@ function init() {
     }
 
     /*
+    "sendCoords" will do a simple ajax POST call to our server with
+    whatever coords we have in our textarea
+    */
+    function sendCoords(latitude, longitude, userID) {
+        var outgoingLat = latitude;
+        var outgoingLng = longitude;
+        var id = userID;
+        $.ajax({
+        url:  '/coords',
+        type: 'POST',
+        contentType: 'application/json',
+        dataType: 'json',
+        data: JSON.stringify({lat: outgoingLat, lng: outGoingLng, id: id})
+        });
+    }
+
+    /*
     If user presses Enter key on textarea, call sendMessage if there
     is something to share
     */
     function outgoingMessageKeyDown(event) {
         if (event.which == 13) {
-        event.preventDefault();
+            event.preventDefault();
         if ($('#outgoingMessage').val().trim().length <= 0) {
             return;
         }

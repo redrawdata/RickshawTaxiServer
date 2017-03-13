@@ -1,81 +1,75 @@
 extends layout
 
 block content 1
-    .container
+    h1 Register as a Barcelona Rickshaw Rider
         
-        h1 Register as a Barcelona Rickshaw Rider
-        
-        p Please register using the form below. Your registration will be assessed before you are given access to the system.
-        
-        ul.errors
-            if errors
-                each error, i in errors
-                    li.alert.alert-danger #{error.msg}
-                    
-        form(method='post', action='/register', enctype='multipart/form-data')
-            
-            .form-group
-                label First Name
-                if name
-                    input.form-control(name='name', type='text', value=name)
-                else
-                    input.form-control(name='name', type='text', placeholder='Enter First Name')
-            
-            .form-group
-                label Surname
-                if surname
-                    input.form-control(name='surname', type='text', value=surname)
-                else
-                    input.form-control(name='surname', type='text', placeholder='Enter Surname')
-            
-            .form-group
-                label NIE
-                if nie
-                    input.form-control(name='nie', type='text', value=nie)
-                else
-                    input.form-control(name='nie', type='text', placeholder='Enter NIE')
-            
-            .form-group
-                label Username
-                if username
-                    input.form-control(name='username', type='text', value=username)
-                else
-                    input.form-control(name='username', type='text', placeholder='Enter Username')
-            
-            .form-group
-                label Company Name
-                if company
-                    input.form-control(name='company', type='text', value=company)
-                else
-                    input.form-control(name='company', type='text', placeholder='Enter Company Name')
-            
-            .form-group
-                label Email
-                if email
-                    input.form-control(name='email', type='text', value=email)
-                else
-                    input.form-control(name='email', type='text', placeholder='Enter Email')
-           
-            .form-group
-                label Telephone
-                if telephone
-                    input.form-control(name='telephone', type='text', value=telephone)
-                else
-                    input.form-control(name='telephone', type='text', placeholder='Enter Telephone No')
-            .form-group
-                label Password
-                if password1
-                    input.form-control(name='password1', type='text', value=password1)
-                else
-                    input.form-control(name='password1', type='password', placeholder='Enter a password')
-            .form-group
-                label Confirm Password
-                if password2
-                    input.form-control(name='password2', type='text', value=password2)
-                else
-                    input.form-control(name='password2', type='password', placeholder='Confirm the password')
-            .form-group
-                label Profile Image
+    p Please register using the form below. Your registration will be assessed before you are given access to the system.
+    
+    ul.errors
+        if errors
+            each error, i in errors
+                li.alert.alert-danger #{error.msg}
                 
+    form(method='post', action='/register', enctype='multipart/form-data')
+        
+        .form-group
+            label First Name
+            if name
+                input.form-control(name='name', type='text', value=name)
+            else
+                input.form-control(name='name', type='text', placeholder='Enter First Name')
+        
+        .form-group
+            label Surname
+            if surname
+                input.form-control(name='surname', type='text', value=surname)
+            else
+                input.form-control(name='surname', type='text', placeholder='Enter Surname')
+        
+        .form-group
+            label NIE
+            if nie
+                input.form-control(name='nie', type='text', value=nie)
+            else
+                input.form-control(name='nie', type='text', placeholder='Enter NIE')
+        
+        .form-group
+            label Username
+            if username
+                input.form-control(name='username', type='text', value=username)
+            else
+                input.form-control(name='username', type='text', placeholder='Enter Username')
+        
+        .form-group
+            label Company Name
+            if company
+                input.form-control(name='company', type='text', value=company)
+            else
+                input.form-control(name='company', type='text', placeholder='Enter Company Name')
+        
+        .form-group
+            label Email
+            if email
+                input.form-control(name='email', type='text', value=email)
+            else
+                input.form-control(name='email', type='text', placeholder='Enter Email')
+        
+        .form-group
+            label Telephone
+            if telephone
+                input.form-control(name='telephone', type='text', value=telephone)
+            else
+                input.form-control(name='telephone', type='text', placeholder='Enter Telephone No')
+        .form-group
+            label Password
+            input.form-control(name='password1', type='password', placeholder='Enter a password')
+        .form-group
+            label Confirm Password
+            input.form-control(name='password2', type='password', placeholder='Confirm the password')
+        .form-group
+            label Profile Image
+            if image
+                input.form-control(name='image', type='file', value=image)
+            else
                 input.form-control(name='image', type='file')
-            input.btn.btn-default(name='submit', type='submit', value='Register')
+        input.btn.btn-default(name='submit', type='submit', value='Register')

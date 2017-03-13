@@ -14,15 +14,23 @@ html
         if user
             script(src='/javascripts/chat.js')
         script.
-            console.log("Location and Time functionality attached");
+        
+            // script in this position will run everytime the page is loaded/refreshed
+            
+            // declare variables and obtain those passed in
             var participants = !{JSON.stringify(participants)};
+            var members = !{JSON.stringify(members)};
+            var index = 0;
+            var photoSRC = 'images/noimage.png';
+            var user = !{JSON.stringify(user)};
+            
+            
             function startTimeAndPostLocation() {
                 startTime();
                 getLocation();
+                
             
             }
-            
-            
             
             function startTime(){
                 var today = new Date();
@@ -35,10 +43,6 @@ html
                 var t = setTimeout(startTime, 500);
             }
             
-                
-            
-            
-
             function getLocation() {
                 
                 console.log("fetching location...");
@@ -54,18 +58,39 @@ html
                 var x = document.getElementById("lat/lng");
                 x.innerHTML = "Latitude: " + position.coords.latitude + 
                 " Longitude: " + position.coords.longitude;
-                $.post("/allpositions", {
-                    name: "Donald",
-                    position: position
-                    }, function(response){
-                        console.log(response);
+                if(!user){
+                    $.post("/allpositions", {
+                            id: "unknown",
+                            position: position
+                        }, function(response){
+                            console.log(response);
                         
-                        //- alert("Response: " + response);
-                    }
-                );
+                            //- alert("Response: " + response);
+                        }
+                    );
+                }
+                else{
+                    $.ajax({
+                        url:  '/coords',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        dataType: 'json',
+                        data: JSON.stringify({lat: position.coords.latitude, lng: position.coords.longitude, id: user.id})
+                    });
+                    console.log('Member Coords POSTed');
+                }
             }
 
-
+            function refreshApprovals(){
+                $.get("/members/refreshApprovals", function(lastestApprovals){
+                    console.log("updated list of Approvals received");
+                    // do something here with the latest Approvals
+                });
+            
+            
+            }
+            
+            
             function showError(error) {
                 switch(error.code) {
                     case error.PERMISSION_DENIED:
@@ -82,65 +107,67 @@ html
                         break;
                 }
             }
+            
             function checkTime(i) {
                 if (i < 10) {i = "0" + i};  // add zero in front of numbers < 10
                 return i;
             }
 
     body(onload="startTimeAndPostLocation()")
-        nav.navbar.navbar-default.navbar-fixed-top
-            .div
-                .navbar-header
-                    button.navbar-toggle.collapsed(type="button", data-toggle="collapse", data-target="#navbar", aria-expanded="false", aria-controls="navbar")
-                        span.sr-only Toggle Navigation
-                        span.icon-bar
-                        span.icon-bar
-                        span.icon-bar
-                    a.navbar-left(href='/')
-                        img(id="logo" src="/images/InteligentBCNlogo.png")
-                    //- a.navbar-brand(href="/") Intelligent Rickshaw BCN
-                #navbar.collapse.navbar-collapse
-                    ul.nav.navbar-nav
-                        li(class=(title === "Home" ? "active" : ""))
-                            a(href="/") Home
-                        li(class=(title === "Rickshaws" ? "active" : ""))
-                            a(href="/rickshaws") Rickshaws
-                        li(class=(title === "Tours" ? "active" : ""))
-                            a(href="/tours") Tours
-                        li(class=(title === "Bookings" ? "active" : ""))
-                            a(href="/bookings") Bookings
-                        li(class=(title === "About" ? "active" : ""))
-                            a(href="/about") About Us
-                        li(class=(title === "Contact" ? "active" : ""))
-                            a(href="/contact") Contact Us
-                        if !user
-                            li(class=(title === "Register" ? "active" : ""))
-                                a(href="/register") Register
-                            li(class=(title === "Login" ? "active" : ""))
-                                a(href="/login") Log In
-                        if user
-                            li(class=(title === "Members" ? "active" : ""))
-                                a(href="/members") Members
-                            li
-                                a(href="/members/logout") Log Out
-        
         .container
-            if messages
-                != messages()
-            //-
-            div
-            if participants
-                p There are #{participants.length} participants
-                if participants
-                    each participant, i in participants
-                        li.alert.alert-danger #{participant.id} , #{participant.username}
-                            
-            if !user
-                p You are NOT logged in
-                
-            if user
-                p UserID: #{user.id} Name: #{user[0].name} #{user[0].surname} Username: #{user[0].username}  AccessLevel: #{user[0].access}
+            nav.navbar.navbar-default.navbar-fixed-top
+                .div
+                    .navbar-header
+                        button.navbar-toggle.collapsed(type="button", data-toggle="collapse", data-target="#navbar", aria-expanded="false", aria-controls="navbar")
+                            span.sr-only Toggle Navigation
+                            span.icon-bar
+                            span.icon-bar
+                            span.icon-bar
+                        a.navbar-left(href='/')
+                            img(id="logo" src="/images/InteligentBCNlogo.png")
+                        //- a.navbar-brand(href="/") Intelligent Rickshaw BCN
+                    #navbar.collapse.navbar-collapse
+                        ul.nav.navbar-nav
+                            li(class=(title === "Home" ? "active" : ""))
+                                a(href="/") Home
+                            li(class=(title === "Rickshaws" ? "active" : ""))
+                                a(href="/rickshaws") Rickshaws
+                            li(class=(title === "Tours" ? "active" : ""))
+                                a(href="/tours") Tours
+                            li(class=(title === "Bookings" ? "active" : ""))
+                                a(href="/bookings") Bookings
+                            li(class=(title === "About" ? "active" : ""))
+                                a(href="/about") About Us
+                            li(class=(title === "Contact" ? "active" : ""))
+                                a(href="/contact") Contact Us
+                            if !user
+                                li(class=(title === "Register" ? "active" : ""))
+                                    a(href="/register") Register
+                                li(class=(title === "Login" ? "active" : ""))
+                                    a(href="/login") Log In
+                            if user
+                                li(class=(title === "Members" ? "active" : ""))
+                                    a(href="/members") Members
+                                li
+                                    a(href="/members/logout") Log Out
             
+            
+            //- 
+                if messages
+                    != messages()
+                div
+                if participants
+                    p There are #{participants.length} participants
+                    if participants
+                        each participant, i in participants
+                            li.alert.alert-danger #{participant.id} , #{participant.username}
+                                
+                if !user
+                    p You are NOT logged in
+                    
+                if user
+                    p UserID: #{user.id} Name: #{user.name} #{user.surname} Username: #{user.username}  AccessLevel: #{user.access}
+                
         
             block content 1
         

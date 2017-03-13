@@ -1,5 +1,5 @@
-// app.js - mysterious-river-55696
-
+const ID = "(app.js) "; // file name here for logging/debug purposes
+console.log(ID + 'Started.... setting up environment....');
 // Acquired Node-Modules and set any Variables
 var express = require('express');
 var path = require('path');
@@ -15,72 +15,17 @@ var LocalStrategy = require('passport-local').Strategy;
 var multer = require('multer');
 var flash = require('connect-flash');
 var expressValidator = require('express-validator');
-//var bcrypt = require('bcrypt');
 var _ = require("underscore");
+console.log('\t' + ID + '...Node-Modules acquired');
+var test = 'test passed';
 var app = express();
+
+// provision for a socket.io server
 var http = require("http").createServer(app);
 var io = require("socket.io").listen(http);
+var User = require('./models/user');
+console.log('\t' + ID + '...Server created and Socket.io');
 
-/*
-  The list of participants in our chatroom.
-  The format of each participant will be:
-  {
-    id:         "sessionId",
-    name:       "participantName",
-    surname:    "surname",
-    username:   "username",
-    company:    "company",
-    
-    
-  }
-*/
-var participants = [];
-
-// add a Participant - just for testing purposes
-participants.push({
-    id:         'fake sessionId1', 
-    name:       'fake1',
-    surname:    'member1',
-    username:   'Fake 1',
-    company:    'IBCN',
-    nie:        'Y1234567X',
-    lat:        '41.408',
-    lng:        '2.17',
-    onRide:     'false'
-});
-participants.push({
-    id:         'fake sessionId2', 
-    name:       'earthquake',
-    surname:    'shaker',
-    username:   'Quaker',
-    company:    'IBCN',
-    nie:        'Y1234945X',
-    lat:        '41.4081',
-    lng:        '2.171',
-    onRide:     'false'
-});
-participants.push({
-    id:         'fake sessionId3', 
-    name:       'fake3',
-    surname:    'member3',
-    username:   'Fake 3',
-    company:    'IBCN',
-    nie:        'Y1234567X',
-    lat:        '41.408',
-    lng:        '2.171',
-    onRide:     'false'
-});
-participants.push({
-    id:         'fake sessionId4', 
-    name:       'earthquake2',
-    surname:    'shaker2',
-    username:   'Quaker2',
-    company:    'IBCN',
-    nie:        'Y1234945X',
-    lat:        '41.4081',
-    lng:        '2.17',
-    onRide:     'false'
-});
 // set Routing Vaiables
 var home = require('./routes/home');
 var rickshaws = require('./routes/rickshaws');
@@ -91,21 +36,20 @@ var register = require('./routes/register');
 var login = require('./routes/login');
 var contact = require('./routes/contact');
 var members = require('./routes/members');
-var admin = require('./routes/admin');
 var coords = require('./routes/coords');
-
-console.log('Node-Modules acquired and Variables set in app.js');
-console.log('   Online Total = ' + participants.length);
+console.log('\t' + ID + '...Routing variables set');
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
-console.log('   View Engine is ' + app.get('view engine'));
+console.log('\t' + ID + '...View Engine is ' + app.get('view engine'));
 
 // set environment
 app.set('port', process.env.PORT || 8080);
+console.log('\t' + ID + '...Port set to: ' + app.get('port'));
 
 // setup middleware
+console.log('\t' + ID + '...Configuring Middleware...');
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
 app.use(bodyParser.json());
@@ -145,12 +89,16 @@ app.use(expressValidator({
 // Flash messaging
 app.use(flash());
 
+console.log('\t\t' + ID + '...Middleware configured');
+
+// HELPER FUNCTIONS ***********************************************************
+
 /*
 this will happen before every GET and POST request, it sets a 
 Global Variable called 'messages' which allows....
 */
 app.use(function (req, res, next) {
-    console.log('setting Global Variable - messages');
+    console.log(ID + 'collecting Express messages');
     res.locals.messages = require('express-messages')(req, res);
     next();
 });
@@ -161,44 +109,79 @@ Global Variable called 'user' which allows checking of
 the 'user' state
 */
 app.get('*', function (req, res, next){
-    console.log('setting Global Variables');
-    console.log('Participants currently: ' + participants);
-    res.locals.participants = participants;
+    console.log(ID + 'making Global Variables available');
+    //console.log('Participants currently: ' + participants);
+    res.locals.participants = [];
+    res.locals.members = [];
+    
     res.locals.user = req.user || null;
-    for (i = 0; i < res.locals.participants.length; i++){
-        console.log('   Participant No:' + i + '   ID: ' + res.locals.participants[i].id + '    Name: ' + res.locals.participants[i].name);
-    }
     if (res.locals.user){
-        console.log('   userID = ' + res.locals.user.id + 
-                    ' UserFullName = ' + res.locals.user[0].name + 
-                    ' ' + res.locals.user[0].surname +   
-                    ' Username = ' + res.locals.user[0].username + 
-                    ' UserAccess = ' + res.locals.user[0].access);
+        res.locals.members = members;
+        res.locals.participants = participants;
+        console.log('\t' + ID + 'User logged in (' + res.locals.user.access + ') - serving data');
     }
     else {
-        console.log('   No User Info');
+        console.log('\t' + ID + 'No User Info - Sensitive data with-held');
+        
     }
+    console.log('\t\t' + ID + 'Participants    = ' + res.locals.participants.length);
+    console.log('\t\t' + ID + 'Members         = ' + res.locals.members.length);
     next();
 });
 
-// catch 404 and forward to error handler
-//app.use(function(req, res, next) {
-//  var err = new Error('Not Found');
-//  err.status = 404;
-//  next(err);
-//});
 
-app.use('/', home);
-app.use('/rickshaws', rickshaws);
-app.use('/tours', tours);
-app.use('/bookings', bookings);
-app.use('/about', about);
-app.use('/register', register);
-app.use('/login', login);
-app.use('/members', members);
-app.use('/contact', contact);
-app.use('/admin', admin);
-app.use('/allpositions', coords);
+// FOR TESTING - adds 'fake' online members
+function addFakeParticipants(){
+    console.log('\t' + ID + '...adding fake online members...');
+    participants.push({
+        id:         'bvhfgonhgoshnggo',
+        memberID:   '100',
+        name:       'fake1',
+        surname:    'member1',
+        username:   'Fake 1',
+        company:    'IBCN',
+        lat:        '41.408',
+        lng:        '2.17',
+        onRide:     'false'
+    });
+    participants.push({
+        id:         'hrntvthlshtlsnt', 
+        memberID:   '101',
+        name:       'earthquake',
+        surname:    'shaker',
+        username:   'Quaker',
+        company:    'IBCN',
+        lat:        '41.4081',
+        lng:        '2.171',
+        onRide:     'false'
+    });
+    participants.push({
+        id:         'ssnyytmtmaymym', 
+        memberID:   '102',
+        name:       'fake3',
+        surname:    'member3',
+        username:   'Fake 3',
+        company:    'IBCN',
+        lat:        '41.408',
+        lng:        '2.171',
+        onRide:     'false'
+    });
+    participants.push({
+        id:         'alryqvlrvybblriy', 
+        memberID:   '103',
+        name:       'earthquake2',
+        surname:    'shaker2',
+        username:   'Quaker2',
+        company:    'IBCN',
+        lat:        '41.4081',
+        lng:        '2.17',
+        onRide:     'false'
+    });
+}
+
+// ********************************************************* HELPER FUNCTIONS
+
+// Socket.io methods *********************************************************
 
 //POST method to create a chat message
 app.post("/message", function(request, response) {
@@ -220,16 +203,33 @@ app.post("/message", function(request, response) {
 
 });
 
+//POST method to receive member Coordinates
+app.post("/coords", function(request, response) {
+    console.log(ID + 'POST to /coords....');
+    //The request body expects a param named "lat", "lng" and "id"
+    var lat = request.body.lat;
+    var lng = request.body.lng;
+    var id = request.body.id;
+        //console.log(message);
+    // update the Participant[id] lat and lng
+    //Emit the new coords to all Participants (.sockets)
+    io.sockets.emit("incomingCoords", {lat: lat, lng: lng, id: id});
+    //Looks good, let the client know
+    response.status(200).json({message: "Coordinates received"});
+
+});
+
 // Handler for Socket.IO events
 
 /* Connection event - occurs when the User(Client) becomes a 'live' User
     by attempting a socket.io connection to the Server*/
 io.on("connection", function(socket){
-    console.log('A connection has occurred (logged by app.js)');
+    
+    console.log(ID + 'A connection has occurred....');
     
     //Helper function to console.log the current Participants
     function logParticipants(){
-        console.log('Current Participants');
+        console.log('Current Participants');   
         for(i=0; i<participants.length; i++){
             console.log('   ' + participants[i].username);
         }
@@ -242,13 +242,28 @@ io.on("connection", function(socket){
         participants to all connected clients
     */
     socket.on("newUser", function(data) {
-        console.log('Server notified of a newUser...');
+        console.log('Server notified of a newUser...memberID: '+data.memberID);
+        // loop through the participants and check for duplicate memberID
+        for (i = 0; i < participants.length; i++){
+            if (participants[i].memberID == data.memberID){
+                // remove matching participant
+                io.sockets.emit("userDisconnected", participants[i].id);
+                participants.splice(i,1);
+                console.log('memberID: '+data.memberID+' has connected again - previous session removed');
+            }
+        }
         // add the newUser to the Participants list
         participants.push({ id:         data.id,
+                            memberID:   data.memberID,
                             name:       data.name,
                             surname:    data.surname,
-                            username:   data.username
+                            username:   data.username,
+                            company:    data.company,
+                            lat:        data.lat,
+                            lng:        data.lng,
+                            onRide:     data.onRide
         });
+        console.log('Participants    = ' + participants.length);
         // 
         io.sockets.emit("newConnection", {participants: participants});
   });
@@ -275,6 +290,16 @@ io.on("connection", function(socket){
 
 });
 
+// ********************************************************* Socket.io methods
+
+
+// catch 404 and forward to error handler
+//app.use(function(req, res, next) {
+//  var err = new Error('Not Found');
+//  err.status = 404;
+//  next(err);
+//});
+
 // error handler
 app.use(function(err, req, res, next) {
   // set locals, only providing error in development
@@ -286,9 +311,39 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-//Start the http server at port and IP defined before
-http.listen(app.get('port'), function(){
-    console.log('   listening on port: ' + app.get('port'));
+// set the Routings
+app.use('/', home);
+app.use('/rickshaws', rickshaws);
+app.use('/tours', tours);
+app.use('/bookings', bookings);
+app.use('/about', about);
+app.use('/register', register);
+app.use('/login', login);
+app.use('/members', members);
+app.use('/contact', contact);
+app.use('/allpositions', coords);
+console.log('\t' + ID + '...Routings set');
+
+// set any program data here
+var participants = [];
+var members = [];
+
+addFakeParticipants();
+console.log('\t' + ID + '...fake Participants = ' + participants.length);
+
+// Update dynamic variables
+console.log('\t' + ID + '...Updating dynamic variables...');
+User.getAllMembers(function(allMembers, callback){
+        console.log('\t\t' + ID + '...Members refreshed');
+        members = allMembers;
+        console.log('\t\t\t' + ID + 'Members = ' + members.length);
+        
+        //Start the http server at port and IP defined before
+        http.listen(app.get('port'), function(){
+            console.log('\t' + ID + '...listening on port: ' + app.get('port'));
+            console.log('\t');
+        });
+        return callback;
 });
 
 module.exports = app;
