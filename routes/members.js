@@ -10,7 +10,7 @@ var App = require('../app');
 module.exports = router;
 
 /* GET Members page. */
-router.get('/', function(req, res) {
+router.get('/', ensureAuthenticated, function(req, res) {
     // create any variables
     console.log('serving the members page');
     console.log('Participants   = ' + res.locals.participants.length);

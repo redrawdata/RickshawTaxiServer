@@ -88,11 +88,8 @@ function init() {
     Update the Map Marker[id]
     */
     socket.on('incomingCoords', function (data) {
-        var lat = data.lat;
-        var lng = data.lng;
-        var id = data.id;
-        console.log('new member coords received');
-        adjustMarkers(lat, lng, id);
+        console.log('new set of member coords received');
+        adjustMarkers(data.participants);
         //$('#messages').prepend('<b>' + name + '</b><br />' + message + '<hr />');
     });
 

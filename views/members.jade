@@ -45,9 +45,12 @@ block content 1
                         map.fitBounds(bounds);
                     }
                     
-                    function adjustMarkers(latitude, longitude, userID){
-                        //map.clear();
-                        console.log('implement map marker changes');
+                    function adjustMarkers(updatedParticipants){
+                        participants=updatedParticipants;
+                        //clear map of markers
+                        //setMapOnAll(null);
+                        //markers=[];
+                        addMarkers(participants);
                     }
                 //-
                     script.

@@ -212,8 +212,17 @@ app.post("/coords", function(request, response) {
     var id = request.body.id;
         //console.log(message);
     // update the Participant[id] lat and lng
+    for (i = 0; i < participants.length; i++){
+        console.log('Participant ' + i + ' ID:' + participants[i].memberID + '('+id+')');
+        if(participants[i].memberID == id){
+            participants[i].lat=lat;
+            participants[i].lng=lng;
+            console.log('participant has location updated');
+        }
+        
+    }
     //Emit the new coords to all Participants (.sockets)
-    io.sockets.emit("incomingCoords", {lat: lat, lng: lng, id: id});
+    io.sockets.emit("incomingCoords", {participants: participants});
     //Looks good, let the client know
     response.status(200).json({message: "Coordinates received"});
 
