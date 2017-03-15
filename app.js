@@ -337,8 +337,8 @@ console.log('\t' + ID + '...Routings set');
 var participants = [];
 var members = [];
 
-addFakeParticipants();
-console.log('\t' + ID + '...fake Participants = ' + participants.length);
+//addFakeParticipants();
+//console.log('\t' + ID + '...fake Participants = ' + participants.length);
 
 // Update dynamic variables
 console.log('\t' + ID + '...Updating dynamic variables...');
