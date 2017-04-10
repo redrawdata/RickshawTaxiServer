@@ -1,0 +1,194 @@
+extends layout
+
+block content 1
+    .search-tabs-wrapper
+        ul.nav.nav-tabs(role="tablist")
+            li.active
+                a(href="#map" role="tab" data-toggle="tab") Map
+            li
+                a(href="#profile" role="tab" data-toggle="tab") Profile
+            li
+                a(href="#account" role="tab" data-toggle="tab") Account
+            li
+                a(href="#members" role="tab" data-toggle="tab") Members
+        
+        .tab-content.search-tabs-content
+            .tab-pane.active(id="map")
+            
+                #map
+                script.
+                    var barcelona = null;
+                    var map = null;
+                    var markers = new Array();
+                    
+                    function initMap() {
+                        barcelona = {lat: 41.398, lng: 2.158};
+                        map = new google.maps.Map(document.getElementById('map'), {
+                            zoom: 16,
+                            center: barcelona
+                        });
+                    }
+                    
+                    function addMarkers(participants){
+                        var bounds = new google.maps.LatLngBounds();
+                        var marks = participants;
+                        for(i=0; i < marks.length; i++){
+                            if (marks[i].lat != null && marks[i].lng != null){
+                                var aLatLng = new google.maps.LatLng(marks[i].lat, marks[i].lng);
+                                markers[i] = new google.maps.Marker({position: aLatLng,map: map});
+                                bounds.extend(aLatLng);
+                                console.log(marks[i].name);
+                            }
+                            
+                        }
+                        map.fitBounds(bounds);
+                    }
+                    
+                    function adjustMarkers(updatedParticipants){
+                        participants=updatedParticipants;
+                        //clear map of markers
+                        //setMapOnAll(null);
+                        //markers=[];
+                        addMarkers(participants);
+                    }
+                //-
+                    script.
+                        
+                            console.log('map created');
+                            console.log('counting participants...');
+                            var bounds = new google.maps.LatLngBounds();
+                            //var markers = new Array();
+                            
+                        }
+                        
+                script(async='',defer='',src='https://maps.googleapis.com/maps/api/js?key=AIzaSyCYoKrfsjvAU7lUHHVPp_vXxrpy_2bJkNw&callback=initMap')
+            
+            
+        
+            .tab-pane(id="profile")
+                h1 My Profile - #{user.username}
+                form(method='post', action='/members/approved', enctype='multipart/form-data')
+                    .row
+                        .col-xs-4
+                            // put the photo here
+                            img(src='images/uploads/' + user.image , alt='Profile Photo')#profilePhoto
+                            
+                        .col-xs-8
+                            .form-group
+                                label First Name
+                                input.form-control(name='name', type='text', value=user.name)
+                            .form-group
+                                label Surname
+                                input.form-control(name='surname', type='text', value=user.surname)
+                            .form-group
+                                label NIE
+                                input.form-control(name='nie', type='text', value=user.nie)
+                            .form-group
+                                label Telephone
+                                input.form-control(name='telephone', type='text', value=user.telephone)
+                    
+                    
+                    
+                    .row
+                        .col-xs-4
+                            .form-group
+                                label Company Name
+                                input.form-control(name='company', type='text', value=user.company)
+                            
+                    
+                        .col-xs-8
+                            .form-group
+                                label Email
+                                input.form-control(name='email', type='text', value=user.email)
+                        //-
+                            span
+                                input.btn.btn-default(name='submit', type='submit', value='Approve Membership')#approve
+                                span(type="text", value="    ")
+                                span(type="text", value="    ")
+                                span
+                                    input.btn.btn-default(name='first', type='submit', value='<<')#firstMember
+                                span
+                                    input.btn.btn-default(name='previous', type='submit', value='<')#approvalsPrevious
+                                span
+                                    input.btn.btn-default(name='next', type='submit', value='>')#approvalsNext
+                                span
+                                    input.btn.btn-default(name='last', type='submit', value='>>')#approvalsLast
+                    
+                // set the photo and populate the form
+                script.
+                    console.log("setting up the form");
+                    $("#photo").attr("src", "images/app1.jpg");
+                    console.log("image set");
+                    // set the name
+                    $("#approvalName").attr("value", members[index].name);
+                    $("#approvalSurname").attr("value", members[index].surname);
+                    $("#approvalNie").attr("value", members[index].nie);
+                    $("#approvalUsername").attr("value", members[index].username);
+                    $("#approvalCompany").attr("value", members[index].company);
+                    $("#approvalEmail").attr("value", members[index].email);
+                    $("#approvalTelephone").attr("value", members[index].telephone);
+                    // loop through Members....
+                    while (index < members.length){
+                        // if the Member is not approved....
+                        if(members[index].isapproved == false){
+                            // set the src of the photo
+                            
+                            break;
+                        }
+                        console.log(members[index].username + " is approved....skipping...");
+                        index++;
+                    }
+                
+            .tab-pane(id="account")
+                h1 My Account
+                .panel.panel-primary
+                    .panel-heading Change password....
+                    .panel-body
+                        form(method='post', action='members/passwordChange')
+                            .form-group
+                                label Current Password
+                                input.form-control(name='currentPassword', type='password', placeholder='Enter Current Username')
+                            .form-group
+                                label New Password
+                                input.form-control(name='newPassword1', type='password', placeholder='Enter New Password')
+                            .form-group
+                                label Confirm New Password
+                                input.form-control(name='newPassword2', type='password', placeholder='Confirm New Password')
+                            input.btn.btn-default(name='submitNewPassword', type='submit', value='Set New Password')
+                div
+                    p Option 2
+                div
+                    p Option 3
+                    
+            .tab-pane(id="members")
+            
+                h1 Member Profiles
+                span There are 
+                    span(type="text", value="99 ")#noofmembers
+                    span members
+                
+                script.
+                    console.log('setting number of members');
+                    //The following commands both do the same thing - only 1 is required
+                    //document.getElementById("noofmembers").textContent=members.length + " ";
+                    $('#noofmembers').html(members.length + " ");
+                    
+                if user.access=10
+                    each member, i in members
+                        if member.access>5 && member.isApproved
+                            .media
+                                .media-left
+                                    img.media-object(src='images/uploads/'+member.image)
+                                    
+                                .media-body
+                                    h4.media-heading #{member.username}
+                                    h6.media-heading #{member.name} #{member.surname}
+                                    h6.media-heading #{member.company}
+                                
+                            
+                
+                            
+                    
+                         
+                        
+                

@@ -11,17 +11,29 @@ module.exports = router;
 
 /* GET Members page. */
 router.get('/', ensureAuthenticated, function(req, res) {
-    // create any variables
-    console.log('serving the members page');
-    console.log('Participants   = ' + res.locals.participants.length);
-    console.log('Members        = ' + res.locals.members.length);
-    for (i=0; i < res.locals.participants.length; i++){
-        console.log('Participant ' + i + ' is ' + res.locals.participants[i].name);
-    }
-    res.render('members', { 
+    // check if this route was accessed via a login, if so check for already online duplicates
+    //if(req.wasALogin){}
+    if(res.locals.user.access >= 15 && res.locals.user.access < 25){
+        console.log('serving the members page for Owners');
+        res.render('membersOwners', { 
                             title: 'Members',
                             user: req.user
-    });
+        });
+    }
+    else if(res.locals.user.access > 5 && res.locals.user.access < 15){
+        console.log('serving the members page for Riders');
+        res.render('membersRiders', { 
+                            title: 'Members',
+                            user: req.user
+        });
+    }
+    else if(res.locals.user.access <= 5){
+        console.log('serving the members page for Admin');
+        res.render('members', { 
+                            title: 'Members',
+                            user: req.user
+        });
+    }
 });
 /* GET a Member's photo. */
 router.get('/photo', ensureAuthenticated, function(req, res) {
@@ -83,6 +95,27 @@ router.post('/positions', function(req, res){
     
     res.send({response:"Thanks for your position"});
     
+});
+
+/* POST - Administrator approves a new profile */
+router.post('/approveMember', function(req, res){
+    console.log(ID + 'Administration approval for memberID: ' + req.body.approvalId);
+    var memberID = req.body.approvalId;
+    //res.send({response:"Thanks for your position"});
+    // Create User in DB    
+    User.approveMember(memberID, function(err, result){
+        if(err) {
+            console.log('       Error during UPDATE in Members table: ' + err);
+            res.redirect('/members');
+            return;
+        } 
+        console.log('   Approval successful for memberID: '+memberID);
+        // Success Message
+        req.flash('success', 'Member Approved');
+    
+        // res.location('/');
+        res.redirect('/members');
+    });
 });
 
 

@@ -4,7 +4,7 @@ block content 1
     .search-tabs-wrapper
         ul.nav.nav-tabs(role="tablist")
             li.active
-                a(href="#map" role="tab" data-toggle="tab") Map
+                a(href="#mapPane" role="tab" data-toggle="tab") Map
             li
                 a(href="#chat" role="tab" data-toggle="tab") Chat
             li
@@ -13,74 +13,173 @@ block content 1
                 a(href="#account" role="tab" data-toggle="tab") Account
             li
                 a(href="#members" role="tab" data-toggle="tab") Members
+                
         .tab-content.search-tabs-content
-            .tab-pane.active(id="map")
-            
+            .tab-pane.active(id="mapPane")
                 #map
+                input.btn.btn-warning(id='viewAll', type='button', value='View All', data-id='VIEWALL')
+                script.
+                    var buttonIndex = 0;
+                each member, i in members
+                    each position, p in positions
+                        if position.memberId === member.id
+                            input.btn.btn-warning(id='viewButton', type='button', value=member.username, data-id=member.id)
+                            script.
+                                $('#viewButton').attr('id', 'viewButton'+buttonIndex);
+                                buttonIndex++;
+                                
+                                console.log('No of buttons '+ buttonIndex);
+                            -break;
+                
+                .modal.fade(id='addMarkerModal', role='dialog')
+                    .modal-dialog
+                        // Modal content
+                        .modal-content
+                            .modal-header
+                                button.close(type='button', data-dismiss='modal') ×
+                                h4.modal-title Add a Map Marker
+                            form(method='post', action='/members/addMapMarker')
+                                .modal-body
+                                    input.form-control(id="theId", name='approvalId', type='text', value="approvalId")
+                                    //h5(id="modalId", name="modalId") ID
+                                    p You will add a new Map Marker
+                                .modal-footer
+                                    button.btn.btn-default(type='button', data-dismiss='modal') Cancel            
+                                    input.btn.btn-warning(name='submit', type='submit', value='Add Marker')
+                
                 script.
                     var barcelona = null;
                     var map = null;
-                    var markers = new Array();
+                    var markers = [];
+                    var modal = document.getElementById('addMarkerModal');
+                    var trackingMarkers = [];
                     
-                    function initMap() {
+                    function initMaps() {
                         barcelona = {lat: 41.398, lng: 2.158};
                         map = new google.maps.Map(document.getElementById('map'), {
-                            zoom: 16,
+                            zoom: 15,
                             center: barcelona
                         });
+                        // This event listener will call addMarker() when the map is clicked.
+                        map.addListener('click', function(event) {
+                            var now = new Date();
+                            var day = now.getDay();
+                            var month = now.getMonth();
+                            var year = now.getYear();
+                            var date = now.getDate();
+                            console.log(now);
+                            console.log(day);
+                            console.log(month);
+                            console.log(year);
+                            console.log(date);
+                            
+                            modal.style.display = 'block';
+                            // addMarker(event.latLng);
+                        });
+
+                        createTrackingMarkers();
                     }
                     
-                    function addMarkers(participants){
-                        var bounds = new google.maps.LatLngBounds();
-                        var marks = participants;
-                        for(i=0; i < marks.length; i++){
-                            if (marks[i].lat != null && marks[i].lng != null){
-                                var aLatLng = new google.maps.LatLng(marks[i].lat, marks[i].lng);
-                                markers[i] = new google.maps.Marker({position: aLatLng,map: map});
-                                bounds.extend(aLatLng);
-                                console.log(marks[i].name);
+                    function viewAllMarkers(){
+                        var theID = $(this).data('id');
+                        // var theID = JSON.parse($(this).attr('data-id'));
+                        console.log('ViewAll buttonID: '+ theID);
+                        //clear the map
+                        setMapOnAll(null);
+                        //display all markers
+                        createTrackingMarkers();
+                    }
+                    
+                    $('#viewAll').on('click', viewAllMarkers);
+                    
+                    function viewMarkersById(){
+                        var theID = $(this).data('id');
+                        console.log('Button of member '+ theID);
+                        //clear the map
+                        setMapOnAll(null);
+                        //display only markers with theID
+                        createTheseTrackingMarkers(theID);
+                    }
+                    
+                    for (i = 0; i < buttonIndex; i++){
+                        console.log('viewButton'+i);
+                        $('#viewButton' + i).on('click', viewMarkersById);
+                    }
+                    
+                    function createTrackingMarkers(){
+                        var trackingBounds = new google.maps.LatLngBounds();
+                        console.log('There are ' + positions.length + ' markers to be created');
+                        for(i = 0; i < positions.length; i++){
+                            if (positions[i].lat != null && positions[i].lng != null){
+                                console.log('making a marker...');
+                                var aLatLng = new google.maps.LatLng(positions[i].lat, positions[i].lng);
+                                trackingMarkers[i] = new google.maps.Marker({
+                                    position: aLatLng, 
+                                    map: map
+                                });
+                                trackingBounds.extend(aLatLng);
+                                console.log(positions[i].name);
                             }
                             
                         }
-                        map.fitBounds(bounds);
+                        map.fitBounds(trackingBounds);
                     }
                     
-                    function adjustMarkers(updatedParticipants){
-                        participants=updatedParticipants;
-                        //clear map of markers
-                        //setMapOnAll(null);
-                        //markers=[];
-                        addMarkers(participants);
-                    }
-                //-
-                    script.
-                        
-                            console.log('map created');
-                            console.log('counting participants...');
-                            var bounds = new google.maps.LatLngBounds();
-                            //var markers = new Array();
+                    function createTheseTrackingMarkers(memberID){
+                        var trackingBounds = new google.maps.LatLngBounds();
+                        console.log('There are ' + positions.length + ' markers to be created');
+                        for(i = 0; i < positions.length; i++){
+                            if (positions[i].lat != null && positions[i].lng != null && positions[i].memberId === memberID){
+                                
+                                console.log('making a marker for memberID: '+memberID+' only...');
+                                var aLatLng = new google.maps.LatLng(positions[i].lat, positions[i].lng);
+                                trackingMarkers[i] = new google.maps.Marker({
+                                    position: aLatLng, 
+                                    map: map
+                                });
+                                trackingBounds.extend(aLatLng);
+                                console.log(positions[i].memberId);
+                            }
                             
                         }
-                        
-                script(async='',defer='',src='https://maps.googleapis.com/maps/api/js?key=AIzaSyCYoKrfsjvAU7lUHHVPp_vXxrpy_2bJkNw&callback=initMap')
-            
+                        map.fitBounds(trackingBounds);
+                    }
+                    
+                    
+                    // Sets the map on all markers in the array.
+                    function setMapOnAll(map){
+                        for (var i = 0; i < trackingMarkers.length; i++){
+                            trackingMarkers[i].setMap(map);
+                        }
+                    }
+
+                    
             .tab-pane(id="chat")
                 span Your name:
                     input(type="text", value="#{user.username}")#name
-                .div(id="messagesAndParts")
-                    .div(id="chatMessages")
-                        #messages
-                    .div(id="chatParticipants")
-                        b Participants
-                        #participants
-                form#messageForm
-                    div(id="chatOut")
-                    div(id="sendButton")
-                    span
-                        textarea(rows="1", cols="50", placeholder="Share something!", maxlength=200)#outgoingMessage
-                        input(type="button", value="Share", disabled=true)#send
+                .row
+                    .col-xs-9
+                        .div(id="chatMessages")
+                            #messages
+                    .col-xs-3
+                        .div(id="chatParticipants")
+                            b Participants
+                            #participants
+                .row
+                    form#messageForm
+                        .col-xs-9
+                            .div(id="chatOut")
+                                input("text",placeholder="Share something!", maxlength=256)#outgoingMessage
+                        .col-xs-3
+                            .div(id="sendButton")
+                                input(type="button", value="Share", disabled=true)#send
+            
+                        
+                        
                 
                 
+            
+            
             .tab-pane(id="profile")
                 h1 My Profile - #{user.username}
                 form(method='post', action='/members/approved', enctype='multipart/form-data')
@@ -142,7 +241,7 @@ block content 1
                     $("#approvalUsername").attr("value", members[index].username);
                     $("#approvalCompany").attr("value", members[index].company);
                     $("#approvalEmail").attr("value", members[index].email);
-                        $("#approvalTelephone").attr("value", members[index].telephone);
+                    $("#approvalTelephone").attr("value", members[index].telephone);
                     // loop through Members....
                     while (index < members.length){
                         // if the Member is not approved....
@@ -189,20 +288,155 @@ block content 1
                     //document.getElementById("noofmembers").textContent=members.length + " ";
                     $('#noofmembers').html(members.length + " ");
                     
-                if user.access=10
-                    each member, i in members
-                        if member.access>5 && member.isapproved
-                            .media
-                                .media-left
-                                    img.media-object(src='images/uploads/'+member.image)
-                                    
-                                .media-body
-                                    h4.media-heading #{member.username}
-                                    h6.media-heading #{member.name} #{member.surname}
-                                    h6.media-heading #{member.company}
-                                
-                            
                 
+                each member, i in members
+                    .panel(id="memberprofilecontainer"+member.id ,style="background-color:white")
+                        .row
+                            .col-md-4
+                                h5 ID No. #{member.id}
+                                h5(id="memberrole"+member.id) Role
+                                img.media-object(src='images/uploads/'+member.image)
+                                h5 #{member.company}
+                            .col-md-5
+                                h6 #{member.username}
+                                h6 #{member.name} #{member.surname}
+                                h6 #{member.nie}
+                                h6 #{member.email}
+                                h6 #{member.telephone}
+                                h6 Registered/Approved: #{member.regDate}
+                                h6 Last Seen: #{member.lastSeen}
+                                
+                            .col-md-3
+                                // The Edit button
+                                .btn.btn-warning(id="edit"+member.id, type='button', style="width:100%") Edit...
+                                
+                                // The Approval button
+                                if member.isApproved
+                                    .btn.btn-success(id="approval"+member.id, type='button', style="width:100%", disabled=true) Approved!
+                                else
+                                    .btn.btn-danger(id="approval"+member.id, type='button', style="width:100%", data-toggle='modal', data-target='#approveModal', data-id=member.id) Unapproved...
+                                
+                                // The Activate/Suspend button
+                                if !member.isSuspended
+                                    .btn.btn-success(id="suspension"+member.id, type='button', style="width:100%", data-toggle='modal', data-target='#suspendModal', data-id=member.id) Active
+                                else
+                                    .btn.btn-danger(id="suspension"+member.id, type='button', style="width:100%", data-toggle='modal', data-target='#activateModal', data-id=member.id) Suspended
+                                    
+                #approveModal.modal.fade(role='dialog')
+                    .modal-dialog
+                        // Modal content
+                        .modal-content
+                            .modal-header
+                                button.close(type='button', data-dismiss='modal') ×
+                                h4.modal-title Approval of a new member profile
+                            form(method='post', action='/members/approveMember')
+                                .modal-body
+                                    input.form-control(id="approvalId", name='approvalId', type='text', value="approvalId")
+                                    //h5(id="modalId", name="modalId") ID
+                                    p Please ensure all member data has been verified and checked before proceeding
+                                .modal-footer
+                                    button.btn.btn-default(type='button', data-dismiss='modal') Cancel            
+                                    input.btn.btn-warning(name='submit', type='submit', value='Approve')
+                
+                #suspendModal.modal.fade(role='dialog')
+                    .modal-dialog
+                        // Modal content
+                        .modal-content
+                            .modal-header
+                                button.close(type='button', data-dismiss='modal') ×
+                                h4.modal-title Suspend a member profile
+                            form(method='post', action='/members/suspendMember')
+                                .modal-body
+                                    input.form-control(id="suspendId", name='suspendId', type='text', value="suspendId")
+                                    //h5(id="modalId", name="modalId") ID
+                                    p You are about to suspend this member's profile
+                                .modal-footer
+                                    button.btn.btn-default(type='button', data-dismiss='modal') Cancel            
+                                    input.btn.btn-danger(name='submit', type='submit', value='Suspend')
+                
+                #activateModal.modal.fade(role='dialog')
+                    .modal-dialog
+                        // Modal content
+                        .modal-content
+                            .modal-header
+                                button.close(type='button', data-dismiss='modal') ×
+                                h4.modal-title Activate a member profile
+                            form(method='post', action='/members/activateMember')
+                                .modal-body
+                                    input.form-control(id="activateId", name='activateId', type='text', value="activateId")
+                                    //h5(id="modalId", name="modalId") ID
+                                    p You are about to activate this member's profile
+                                .modal-footer
+                                    button.btn.btn-default(type='button', data-dismiss='modal') Cancel            
+                                    input.btn.btn-warning(name='submit', type='submit', value='Activate')
+                
+                
+                script.
+                    
+                    for(i = 0; i < members.length; i++){
+                        //set background colours of members by access level
+                        if(members[i].access<25 && members[i].access>15){
+                            // is an Owner profile
+                            console.log("coloring skyblue");
+                            $("#memberprofilecontainer" + members[i].id).attr("style", "background-color:skyblue");
+                            $("#memberrole" + members[i].id).html("Owner");
+                        }
+                        else if(members[i].access<=15 && members[i].access>5){
+                            // is a Rider profile
+                            console.log("coloring yellow");
+                            $("#memberprofilecontainer" + members[i].id).attr("style", "background-color:yellow");
+                            $("#memberrole" + members[i].id).html("Rider");
+                        }
+                        else if(members[i].access<=5){
+                            // is an Administrator profile
+                            console.log("coloring blue");
+                            $("#memberprofilecontainer" + members[i].id).attr("style", "background-color:grey");
+                            $("#memberrole" + members[i].id).html("Administrator");
+                        }
+                        else{
+                            console.log("no coloring");
+                        }
+                        
+                        // setup buttons
+                        $('#approval'+members[i].id).on('click', approveMember);
+                        $('#suspension'+members[i].id).on('click', suspendMember);
+                        $('#edit'+members[i].id).on('click', editMember);
+                        
+                    }
+                    
+                    function approveMember() {
+                        var theID = $(this).data('id');
+                        $("#approvalId").val( theID );
+                        $("#approvalId").html( theID );
+                    }
+                    function suspendMember() {
+                        var action = $(this).data('target');
+                        var theID = $(this).data('id');
+                        console.log(action);
+                        if (action=="#suspendModal"){
+                            $("#suspendId").val( theID );
+                            $("#suspendId").html( theID );
+                        }
+                        if (action=="#activateModal"){
+                            $("#activateId").val( theID );
+                            $("#activateId").htmparticipantsl( theID );
+                        }
+                        
+                    }
+                    function editMember() {
+                        var theID = $(this).data('id');
+                        $("#editId").val( theID );
+                        $("#editId").html( theID );
+                    }
+           
+                
+        
+                    
+    // script(async='',defer='',src='https://maps.googleapis.com/maps/api/js?key=AIzaSyCYoKrfsjvAU7lUHHVPp_vXxrpy_2bJkNw&callback=initMaps')
+                
+                               
+                            
+           
                             
                     
                          

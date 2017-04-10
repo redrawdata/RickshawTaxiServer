@@ -1,3 +1,4 @@
+const ID = '(login.js) ';
 // login.js = Routing for Login page
 
 var express = require('express');
@@ -33,36 +34,23 @@ function ensureNotLoggedIn(req, res, next){
 */
 
 router.post('/', passport.authenticate('local',{failureRedirect:'/login', failureFlash:'invalid username or password'}), function(req, res){
-    console.log(req.user.id);
-    console.log(req.user.name);
-    console.log(req.user.surname);
-    console.log(req.user.username);
-    console.log(req.user.access);
     
-    
-    console.log('redirecting to Members page...');
-    //var password = req.body.password;
-    // this runs if LocalStrategy is TRUE
-    // console.log(req.user);
-    req.flash('success', 'You are logged in');
+    // login good - redirect to members page
+    console.log('\t' + ID + 'redirecting to Members page...');
+    //req.flash('success', 'You are logged in');
+    //req.wasALogin = true;
     res.redirect('/members');
-    /*
-    if (req.user.access < 5){
-        res.redirect('/admin');
-    }
-    if (req.user.access >= 5 && req.user.access < 15){
-        res.redirect('/members');
-    }
-    */
+    
+    
 });
 
 passport.serializeUser(function(user, done) {
-    console.log('User serialized by login.js');
+    console.log('\t' + ID + 'User serialized');
     done(null, user.id);
 });
 
 passport.deserializeUser(function(id, done) {
-    console.log('User deserialized by login.js');
+    console.log('\t' + ID + 'User deserialized');
     User.getUserById(id, function (err, user) {
         done(err, user);
     });
@@ -71,34 +59,26 @@ passport.deserializeUser(function(id, done) {
 // called when a POST to '/' is made (via passport.authenticate)
 passport.use(new LocalStrategy(
     function(username, password, done){
-        console.log('Attempting Authentication with PassportJS...');
-        console.log('   looking for a Username');
+        console.log(ID + 'Logging in...');
         User.getUserByUsername(username, function(err, user){
             if(err) {
-                console.log('Authenication fail during DB query' + err);
+                console.log('\t' + ID + 'Authenication fail during DB query' + err);
                 return done(null, false, {message:'unable to access database'});
             }
             if(!user){
-                console.log('   no match for Username');
+                console.log('\t' + ID + 'no match for Username');
                 return done(null, false, {message:'unknown user'});
             }
             else{
-                console.log('   match on Username');
-                console.log('   looking for a Password match');
+                console.log('\t' + ID + 'match on Username');
                 User.comparePassword(password, user.password, function(err, isMatch){
                     if(err) throw err;
                     if(isMatch){
-                        console.log('   match on Password');
-                        console.log('Authentication SUCCESSFUL: User Info');
-                        console.log('   UserID: ' + user.id);
-                        console.log('   User Full Name: ' + user.name + ' ' + user.surname);
-                        console.log('   Username: ' + user.username);
-                        console.log('   AccessLevel: ' + user.access);
+                        console.log('\t' + ID + 'match on Password');
                         return done(null, user); // passport.serializeUser now happens
                     }
                     else{
-                        console.log('   no match for Password');
-                        console.log('Authentication FAILED!!!');
+                        console.log('\t' + ID + 'no match on Password');
                         return done(null, false, {message:'invalid password'});
                     }
                 });

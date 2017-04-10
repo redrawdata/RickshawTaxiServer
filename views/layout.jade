@@ -12,22 +12,29 @@ html
         script(src='//code.jquery.com/jquery-1.11.0.min.js')
         script(src='/socket.io/socket.io.js')
         if user
-            script(src='/javascripts/chat.js')
+        if user.isapproved  
+                script(src='/javascripts/chat.js')
         script.
         
             // script in this position will run everytime the page is loaded/refreshed
-            
+            console.log('\n');
+            console.log('Script begins...');
             // declare variables and obtain those passed in
             var participants = !{JSON.stringify(participants)};
             var members = !{JSON.stringify(members)};
+            var positions = !{JSON.stringify(positions)};
+            //console.log('first member is ' + members[0].username);
             var index = 0;
+            var buttonIndex = 0;
             var photoSRC = 'images/noimage.png';
             var user = !{JSON.stringify(user)};
             
             
-            function startTimeAndPostLocation() {
+            function myOnPageLoad() {
+                console.log('Body had loaded..');
                 startTime();
-                getLocation();
+                console.log('Clock started..');
+                // getLocation();
                 
             
             }
@@ -113,7 +120,7 @@ html
                 return i;
             }
 
-    body(onload="startTimeAndPostLocation()")
+    body(onload="myOnPageLoad()")
         .container
             nav.navbar.navbar-default.navbar-fixed-top
                 .div
@@ -124,8 +131,9 @@ html
                             span.icon-bar
                             span.icon-bar
                         a.navbar-left(href='/')
-                            img(id="logo" src="/images/InteligentBCNlogo.png")
-                        //- a.navbar-brand(href="/") Intelligent Rickshaw BCN
+                            #logo
+                                img(src="/images/InteligentBCNlogo.png", style="max-height:50px")
+                            //- a.navbar-brand(href="/") Intelligent Rickshaw BCN
                     #navbar.collapse.navbar-collapse
                         ul.nav.navbar-nav
                             li(class=(title === "Home" ? "active" : ""))
@@ -162,11 +170,11 @@ html
                         each participant, i in participants
                             li.alert.alert-danger #{participant.id} , #{participant.username}
                                 
-                if !user
-                    p You are NOT logged in
-                    
-                if user
-                    p UserID: #{user.id} Name: #{user.name} #{user.surname} Username: #{user.username}  AccessLevel: #{user.access}
+            if !user
+                p You are NOT logged in
+                
+            if user
+                p UserID: #{user.id} Name: #{user.name} #{user.surname} Username: #{user.username}  AccessLevel: #{user.access} Approval: #{user.isApproved}
                 
         
             block content 1
@@ -179,5 +187,5 @@ html
             
         script( src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js" )
         script( src="/javascripts/bootstrap.js" )
-        script ( src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCYoKrfsjvAU7lUHHVPp_vXxrpy_2bJkNw&callback=initMap" )
-
+        script(async='',defer='', src='https://maps.googleapis.com/maps/api/js?key=AIzaSyCYoKrfsjvAU7lUHHVPp_vXxrpy_2bJkNw&callback=initMaps')
+    

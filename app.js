@@ -23,7 +23,10 @@ var app = express();
 // provision for a socket.io server
 var http = require("http").createServer(app);
 var io = require("socket.io").listen(http);
+
+//provision access to Models
 var User = require('./models/user');
+var Position = require('./models/position');
 console.log('\t' + ID + '...Server created and Socket.io');
 
 // set Routing Vaiables
@@ -98,6 +101,7 @@ this will happen before every GET and POST request, it sets a
 Global Variable called 'messages' which allows....
 */
 app.use(function (req, res, next) {
+    console.log('                                    ');
     console.log(ID + 'collecting Express messages');
     res.locals.messages = require('express-messages')(req, res);
     next();
@@ -110,23 +114,46 @@ the 'user' state
 */
 app.get('*', function (req, res, next){
     console.log(ID + 'making Global Variables available');
-    //console.log('Participants currently: ' + participants);
     res.locals.participants = [];
     res.locals.members = [];
-    
+    res.locals.positions = [];
     res.locals.user = req.user || null;
     if (res.locals.user){
-        res.locals.members = members;
-        res.locals.participants = participants;
-        console.log('\t' + ID + 'User logged in (' + res.locals.user.access + ') - serving data');
+        User.getAllMembers('*', function(err, allMembers){
+            if (err){
+                console.log('error refreshing Members');
+            }
+            console.log('\t\t' + ID + '...Members refreshed');
+            members = allMembers;
+            res.locals.members = members;
+            console.log('\t\t\t' + ID + 'Members = ' + members.length);
+            Position.getAllPositions('*', function(error, allPositions){
+                if (error){
+                    console.log('error refreshing Positions');
+                }
+                console.log('\t\t' + ID + '...Positions refreshed');
+                positions = allPositions;
+                res.locals.positions = positions;
+                console.log('\t\t\t' + ID + 'Positions = ' + positions.length);
+                
+                res.locals.participants = participants;
+                
+                console.log('\t' + ID + 'User logged in (' + res.locals.user.access + ') - serving data');
+                console.log('\t\t' + ID + 'Participants    = ' + res.locals.participants.length);
+                console.log('\t\t' + ID + 'Members         = ' + res.locals.members.length);
+                console.log('\t\t' + ID + 'Positions         = ' + res.locals.positions.length);
+                next();
+            });
+        });
     }
     else {
-        console.log('\t' + ID + 'No User Info - Sensitive data with-held');
         
+        console.log('\t' + ID + 'No User Info - Sensitive data with-held');
+        console.log('\t\t' + ID + 'Participants    = ' + res.locals.participants.length);
+        console.log('\t\t' + ID + 'Members         = ' + res.locals.members.length);
+        next();
     }
-    console.log('\t\t' + ID + 'Participants    = ' + res.locals.participants.length);
-    console.log('\t\t' + ID + 'Members         = ' + res.locals.members.length);
-    next();
+    
 });
 
 
@@ -139,7 +166,7 @@ function addFakeParticipants(){
         name:       'fake1',
         surname:    'member1',
         username:   'Fake 1',
-        company:    'IBCN',
+        company:    'Funky Cycle',
         lat:        '41.408',
         lng:        '2.17',
         onRide:     'false'
@@ -150,7 +177,7 @@ function addFakeParticipants(){
         name:       'earthquake',
         surname:    'shaker',
         username:   'Quaker',
-        company:    'IBCN',
+        company:    'Funky Cycle',
         lat:        '41.4081',
         lng:        '2.171',
         onRide:     'false'
@@ -161,7 +188,7 @@ function addFakeParticipants(){
         name:       'fake3',
         surname:    'member3',
         username:   'Fake 3',
-        company:    'IBCN',
+        company:    'Trixi',
         lat:        '41.408',
         lng:        '2.171',
         onRide:     'false'
@@ -172,7 +199,7 @@ function addFakeParticipants(){
         name:       'earthquake2',
         surname:    'shaker2',
         username:   'Quaker2',
-        company:    'IBCN',
+        company:    'Trixi',
         lat:        '41.4081',
         lng:        '2.17',
         onRide:     'false'
@@ -213,7 +240,7 @@ app.post("/coords", function(request, response) {
         //console.log(message);
     // update the Participant[id] lat and lng
     for (i = 0; i < participants.length; i++){
-        console.log('Participant ' + i + ' ID:' + participants[i].memberID + '('+id+')');
+        console.log('Participant ' + i + ' ID:' + participants[i].memberID + '('+id+')');A
         if(participants[i].memberID == id){
             participants[i].lat=lat;
             participants[i].lng=lng;
@@ -238,7 +265,7 @@ io.on("connection", function(socket){
     
     //Helper function to console.log the current Participants
     function logParticipants(){
-        console.log('Current Participants');   
+        console.log('Current PAarticipants');   
         for(i=0; i<participants.length; i++){
             console.log('   ' + participants[i].username);
         }
@@ -336,13 +363,18 @@ console.log('\t' + ID + '...Routings set');
 // set any program data here
 var participants = [];
 var members = [];
+var positions = [];
 
-//addFakeParticipants();
-//console.log('\t' + ID + '...fake Participants = ' + participants.length);
+addFakeParticipants();
+console.log('\t' + ID + '...fake Participants = ' + participants.length);
 
 // Update dynamic variables
 console.log('\t' + ID + '...Updating dynamic variables...');
-User.getAllMembers(function(allMembers, callback){
+Position.getAllPositions('*', function(error, allPositions){
+    console.log('\t\t' + ID + '...Positions refreshed');
+    positions = allPositions;
+    console.log('\t\t\t' + ID + 'Positions = ' + positions.length);
+    User.getAllMembers('*', function(err, allMembers){
         console.log('\t\t' + ID + '...Members refreshed');
         members = allMembers;
         console.log('\t\t\t' + ID + 'Members = ' + members.length);
@@ -352,8 +384,9 @@ User.getAllMembers(function(allMembers, callback){
             console.log('\t' + ID + '...listening on port: ' + app.get('port'));
             console.log('\t');
         });
-        return callback;
+    });
 });
+
 
 module.exports = app;
 module.exports = io;

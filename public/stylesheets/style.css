@@ -1,25 +1,42 @@
 body {
   padding-top: 40px;
-  font-family:URW Chancery L;
+  
   
 }
 
 .container {
     padding-top:20px;
 }
-
+.row{
+    margin: 10px;
+}
 h1 {
     margin-top:0px;
+    padding-top:0px;
+    font-size:22px;
+}
+h2 {
+    margin-top:0px;
+    padding-top:0px;
+    font-size:18px;
+}
+.media-left{
+    width:40%;
     
 }
-
+.media-body{
+    width:60%;
+}
 ul.success li, ul.failure li, ul.info li, ul.error li{
     margin:20px 0 20px 0;
 }
 
 .jumbotron {
   /*background:url(../images/bg.jpg) no-repeat;*/
-  background-size:100%;
+  padding-top:10px;
+  text-align:center;
+  padding-bottom:10px;
+  margin-bottom:10px;
 border:3px;
 border-color:black;
 border-radius:40px;
@@ -45,7 +62,7 @@ height:100%;
 display:table-cell;
 border:3px solid black;
 margin:0px;
-padding:0px:
+padding:0px;
 }
 #jumboImage > img{
 display:show;
@@ -54,7 +71,7 @@ width:100%;
 height:100%;
 border:3px solid black;
 margin:0px;
-padding:0px:
+padding:0px;
 }
 #jumboDrivers{
 padding:0px;
@@ -117,25 +134,33 @@ padding:0px;
 }
 
 #chatMessages{
-overflow:scroll;
-position:relative;
-    width:50%;
-    min-width:100px;
-    display:table-cell;
+border:0px;
+padding:0px;
+overflow-y:scroll;
+
+    width:100%;
+    min-height:300px;
+    max-height:300px;
 border:3px solid red;
-text-align:center;
+text-align:left;
 }
 #messages{
     position:initial;
 }
 #chatParticipants{
+border:0px;
+padding:0px;
 overflow-y:scroll;
-height:30px;
-    width:50%;
-    display:table-cell;
+min-height:300px;
+max-height:300px;
+    width:100%;
+    
 border:3px solid black;
 }
-
+#profilePhoto{
+    width:100%;
+    height:100%;
+}
 #photo{
     width:100%;
     height:100%;
@@ -204,17 +229,21 @@ footer{
     text-align: center;
 }
 
+}
+
 #logo {
-        width: 195px;
-        height: auto;
+        max-height: 46px;
         padding-top: 3px;
         padding-left: 3px;
         padding-right: 5px;
       }
+      
 #map {
         width: 100%;
-        height: 400px;
-        background-color: grey;
+        height: 800px;
+        border: 0px;
+        padding-top:20px;
+        padding-bottom:20px;
       }
 
 
