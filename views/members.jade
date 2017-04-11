@@ -16,14 +16,16 @@ block content 1
                 
         .tab-content.search-tabs-content
             .tab-pane.active(id="mapPane")
+                input.btn.btn-success(id='viewLive', type='button', value='LIVE', data-id='viewLive', disabled='true')
+                input.btn.btn-warning(id='viewData', type='button', value='view data', data-id='viewData')
                 #map
-                input.btn.btn-warning(id='viewAll', type='button', value='View All', data-id='VIEWALL')
+                input.btn.btn-warning(id='viewAll', type='button', value='View All', data-id='VIEWALL', disabled='true')
                 script.
                     var buttonIndex = 0;
                 each member, i in members
                     each position, p in positions
                         if position.memberId === member.id
-                            input.btn.btn-warning(id='viewButton', type='button', value=member.username, data-id=member.id)
+                            input.btn.btn-warning(id='viewButton', type='button', value=member.username, data-id=member.id, disabled='true')
                             script.
                                 $('#viewButton').attr('id', 'viewButton'+buttonIndex);
                                 buttonIndex++;
@@ -76,8 +78,10 @@ block content 1
                             modal.style.display = 'block';
                             // addMarker(event.latLng);
                         });
-
-                        createTrackingMarkers();
+                        if(!$('#viewLive').attr('disabled')){
+                            createTrackingMarkers();
+                        }
+                        
                     }
                     
                     function viewAllMarkers(){
@@ -145,6 +149,57 @@ block content 1
                         map.fitBounds(trackingBounds);
                     }
                     
+                    function viewData(){
+                    
+                        // enable/disable buttons
+                        $('#viewLive').attr('disabled',false);
+                        $('#viewAll').attr('disabled',false);
+                        $('#viewData').attr('disabled','true');
+                        var index = 0;
+                        var moreButtons = true;
+                        while (moreButtons){
+                            var exists = document.getElementById('viewButton'+index);
+                            console.log(exists);
+                            if(exists){
+                                $('#viewButton'+index).attr('disabled',false);
+                                index++;
+                            }
+                            else{
+                                moreButtons=false;
+                            }
+                        }
+                        createTrackingMarkers();
+                        
+                    }
+                    
+                    $('#viewData').on('click', viewData);
+                    
+                    function viewLive(){
+                    
+                        //clear the map
+                        setMapOnAll(null);
+                        
+                        // enable/disable buttons
+                        
+                        $('#viewLive').attr('disabled',true);
+                        $('#viewAll').attr('disabled',true);
+                        $('#viewData').attr('disabled',false);
+                        var index = 0;
+                        var moreButtons = true;
+                        while (moreButtons){
+                            var exists = document.getElementById('viewButton'+index);
+                            console.log(exists);
+                            if(exists){
+                                $('#viewButton'+index).attr('disabled',true);
+                                index++;
+                            }
+                            else{
+                                moreButtons=false;
+                            }
+                        }
+                    
+                    }
+                    $('#viewLive').on('click', viewLive);
                     
                     // Sets the map on all markers in the array.
                     function setMapOnAll(map){
