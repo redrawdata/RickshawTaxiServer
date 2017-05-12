@@ -10,66 +10,27 @@ block content 1
         
     .jumbotron
         h2 Connecting Customers
-        a.btn.btn-primary.btn-lg(href="#") Learn More &raquo;
+        a.btn.btn-primary.btn-sm(href="#") Learn More &raquo;
     
-    #carousel.carousel.slide(data-ride='carousel')
-        ol.carousel-indicators
-            li.active(data-target='#carousel', data-slide-to='0')
-            li(data-target='#carousel', data-slide-to='1')
-            li(data-target='#carousel', data-slide-to='2')
-            li(data-target='#carousel', data-slide-to='3')
-            li(data-target='#carousel', data-slide-to='4')
-            li(data-target='#carousel', data-slide-to='5')
+    .jumbotron
+        h2 Connectivity & Security
+        a.btn.btn-primary.btn-sm(href="#") Learn More &raquo;
+    
+    .jumbotron
+        h5 Rickshaws & Riders
+        a.h6(href='/rickshaws') What and who?
             
-        .carousel-inner(role='listbox')
-            .item.active
-                img(src='images/slide1.jpg', alt='Connecting Drivers')
-                .carousel-caption
-                    h3(id='cap_h3') Connecting Drivers
-
-            .item
-                img(src='images/slide2.jpg', alt='Connecting Customers')
-                .carousel-caption
-                    h3(id='cap_h3') Connecting Customers
-
-            .item
-                img(src='images/slide3.jpg', alt='Rickshaw Barcelona')
-                .carousel-caption
-                    h3(id='cap_h3') Rickshaws BCN
-                        
-            .item
-                img(src='images/slide4.jpg', alt='Rickshaw Riders')
-                .carousel-caption
-                    h3(id='cap_h3') Rickshaw Drivers
-                        
-            .item
-                img(src='images/slide5.jpg', alt='Tours')
-                .carousel-caption
-                    h3(id='cap_h3') Barcelona Tours
-                        
-            .item
-                img(src='images/slide6.jpg', alt='Book Now')
-                .carousel-caption
-                    h3(id='cap_h3') Book a Tour
-
-        a.left.carousel-control(href='#carousel', role='button', data-slide='prev')
-            span.glyphicon.glyphicon-chevron-left(aria-hidden='true')
-            span.sr-only Previous
-        a.right.carousel-control(href='#carousel', role='button', data-slide='next')
-            span.glyphicon.glyphicon-chevron-right(aria-hidden='true')
-            span.sr-only Next
+    .jumbotron
+        h5  Barcelona Tours
+        a.btn.btn-primary.btn-sm(href="/tours") Tours &raquo;
     
-
-    .row
-        .col-xs-4
-            h2 Tours
-            p Hop into one of Barcelona's eco-friendly rickshaws and join your driver for a relaxing and informative guided tour of the city's ports, beaches, historic centre, parks and major attractions. 
-            a.btn.btn-default(href="/tours") View Tours
-        .col-xs-4
-            h2 Bookings
-            p You can check prices and availability of tours for any day of the year, request a specific guide and book your personal adventure around the streets and spaces of Barcelona.  
-            a.btn.btn-default(href="/bookings") View Bookings
-        .col-xs-4
-            h2 Contact Us
-            p About Us. About Us. About Us. About Us. About Us. About Us. About Us. About Us. About Us. About Us. About Us. About Us. About Us. About Us. About Us. About Us. About Us. About Us. About Us. About Us.  
-            a.btn.btn-default(href="#") View Details
+    .jumbotron
+        h5  Book a Tour
+        a.btn.btn-primary.btn-sm(href="/bookings") Book Now &raquo;
+        
+    .jumbotron
+        h5  Contact Us
+        a.btn.btn-primary.btn-sm(href="/contact") Contact Us &raquo;
+        
+    a.btn.btn-primary.btn-sm(href="/register", style="width:100%") Register With Us &raquo;
+    a.btn.btn-primary.btn-sm(href="/login", style="width:100%") Members Login &raquo;        

@@ -119,6 +119,10 @@ app.get('*', function (req, res, next){
     res.locals.positions = [];
     res.locals.user = req.user || null;
     if (res.locals.user){
+        console.log('\t' + ID + 'User logged in (Level: ' + res.locals.user.access + ')');
+        res.locals.participants = participants;
+        next();
+        /*
         User.getAllMembers('*', function(err, allMembers){
             if (err){
                 console.log('error refreshing Members');
@@ -138,19 +142,20 @@ app.get('*', function (req, res, next){
                 
                 res.locals.participants = participants;
                 
-                console.log('\t' + ID + 'User logged in (' + res.locals.user.access + ') - serving data');
+                
                 console.log('\t\t' + ID + 'Participants    = ' + res.locals.participants.length);
                 console.log('\t\t' + ID + 'Members         = ' + res.locals.members.length);
                 console.log('\t\t' + ID + 'Positions         = ' + res.locals.positions.length);
                 next();
             });
         });
+        */
     }
     else {
         
-        console.log('\t' + ID + 'No User Info - Sensitive data with-held');
-        console.log('\t\t' + ID + 'Participants    = ' + res.locals.participants.length);
-        console.log('\t\t' + ID + 'Members         = ' + res.locals.members.length);
+        console.log('\t' + ID + 'No User Info - Not logged in');
+        //console.log('\t\t' + ID + 'Participants    = ' + res.locals.participants.length);
+        //console.log('\t\t' + ID + 'Members         = ' + res.locals.members.length);
         next();
     }
     
@@ -209,7 +214,7 @@ function addFakeParticipants(){
 // ********************************************************* HELPER FUNCTIONS
 
 // Socket.io methods *********************************************************
-
+members
 //POST method to create a chat message
 app.post("/message", function(request, response) {
     console.log('POST to /message - app.js');
@@ -285,7 +290,7 @@ io.on("connection", function(socket){
                 // remove matching participant
                 io.sockets.emit("userDisconnected", participants[i].id);
                 participants.splice(i,1);
-                console.log('memberID: '+data.memberID+' has connected again - previous session removed');
+                console.log('memberID: '+data.memberID+' has connected again - previous memberssession removed');
             }
         }
         // add the newUser to the Participants list
@@ -371,13 +376,10 @@ console.log('\t' + ID + '...fake Participants = ' + participants.length);
 // Update dynamic variables
 console.log('\t' + ID + '...Updating dynamic variables...');
 Position.getAllPositions('*', function(error, allPositions){
-    console.log('\t\t' + ID + '...Positions refreshed');
     positions = allPositions;
-    console.log('\t\t\t' + ID + 'Positions = ' + positions.length);
     User.getAllMembers('*', function(err, allMembers){
-        console.log('\t\t' + ID + '...Members refreshed');
         members = allMembers;
-        console.log('\t\t\t' + ID + 'Members = ' + members.length);
+        //console.log('\t\t\t' + ID + 'Members = ' + members.length);
         
         //Start the http server at port and IP defined before
         http.listen(app.get('port'), function(){
@@ -387,6 +389,15 @@ Position.getAllPositions('*', function(error, allPositions){
     });
 });
 
+//var aDate = new Date(0);
+//console.log(aDate);
+//var bDate = new Date(1000*60*60*24*365);
+//console.log(bDate);
+//var now = new Date();
+//var nowVal = Date.parse(now);
+//console.log(now);
+//console.log(nowVal);
+//console.log(new Date(nowVal));
 
 module.exports = app;
 module.exports = io;

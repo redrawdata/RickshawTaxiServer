@@ -6,6 +6,7 @@ var onlineUsers = require('../app');
 var http = require("http").createServer(router);
 var io = require("socket.io").listen(http);
 var User = require('../models/user');
+var Position = require('../models/position');
 var App = require('../app');
 module.exports = router;
 
@@ -13,27 +14,57 @@ module.exports = router;
 router.get('/', ensureAuthenticated, function(req, res) {
     // check if this route was accessed via a login, if so check for already online duplicates
     //if(req.wasALogin){}
-    if(res.locals.user.access >= 15 && res.locals.user.access < 25){
-        console.log('serving the members page for Owners');
-        res.render('membersOwners', { 
+    
+    // refresh the dynamic Variables.....
+    
+    // refresh the Members
+    User.getAllMembers('*', function(err, allMembers){
+        if (err){
+            console.log(ID + 'error refreshing Members');
+        }
+        console.log('\t\t' + ID + '...Members refreshed');
+        res.locals.members = allMembers;
+        console.log('\t\t\t' + ID + 'Members = ' + allMembers.length);
+        Position.getAllPositions('*', function(error, allPositions){
+            if (error){
+                console.log(ID + 'error refreshing Positions');
+            }
+            console.log('\t\t' + ID + '...Positions refreshed');
+            res.locals.positions = allPositions;
+            console.log('\t\t\t' + ID + 'Positions = ' + allPositions.length);
+            console.log('\t\t' + ID + 'Participants    = ' + res.locals.participants.length);
+            console.log('\t\t' + ID + 'Members         = ' + res.locals.members.length);
+            console.log('\t\t' + ID + 'Positions         = ' + res.locals.positions.length);
+            
+            if(res.locals.user.access >= 15 && res.locals.user.access < 25){
+                console.log('serving the members page for Owners');
+                res.render('membersOwners', { 
                             title: 'Members',
                             user: req.user
-        });
-    }
-    else if(res.locals.user.access > 5 && res.locals.user.access < 15){
-        console.log('serving the members page for Riders');
-        res.render('membersRiders', { 
+                });
+            }
+            else if(res.locals.user.access > 5 && res.locals.user.access < 15){
+                console.log('serving the members page for Riders');
+                res.render('membersRiders', { 
                             title: 'Members',
                             user: req.user
-        });
-    }
-    else if(res.locals.user.access <= 5){
-        console.log('serving the members page for Admin');
-        res.render('members', { 
+                });
+            }
+            else if(res.locals.user.access <= 5){
+                console.log('serving the members page for Admin');
+                res.render('members', { 
                             title: 'Members',
                             user: req.user
+                });
+            }
+            
+            
+            
         });
-    }
+    });
+    
+    
+    
 });
 /* GET a Member's photo. */
 router.get('/photo', ensureAuthenticated, function(req, res) {
@@ -97,6 +128,42 @@ router.post('/positions', function(req, res){
     
 });
 
+/* POST - Admin is creating a Map Marker */
+router.post('/addAPosition', function(req, res){
+    console.log(ID + 'Admin submits a position...');
+    var id = "";
+    console.log(id);
+    var type = req.body.mmType;
+    console.log(type);
+    var memberId = req.body.mmMember;
+    console.log(memberId);
+    var latitude = req.body.latitude;
+    console.log(latitude);
+    var longitude = req.body.longitude;
+    console.log(longitude);
+    var date = req.body.dateTime;
+    console.log(date);
+    var isVisible = false;
+    if (req.body.isVisible){
+        isVisible = true;
+    }
+    console.log(isVisible);
+    var comment = req.body.comment;
+    console.log(comment);
+    var newPosition = new Position(id, memberId, type, latitude, longitude, date, comment, isVisible);
+    Position.addAPosition(newPosition, function(err, result){
+        if (err){
+            console.log('Error while adding new Position: ' + err);
+            res.send('200');
+        }
+        else{
+            res.redirect('/members');
+        }
+    });
+    
+    
+});
+
 /* POST - Administrator approves a new profile */
 router.post('/approveMember', function(req, res){
     console.log(ID + 'Administration approval for memberID: ' + req.body.approvalId);
@@ -146,7 +213,7 @@ function ensureAuthenticated(req, res, next){
         console.log('   granted');
         return next();
     }
-    console.log('   denied - redirectiog to Login Page');
+    console.log('   denied - redirecting to Login Page');
     res.redirect('/login');
 }
 

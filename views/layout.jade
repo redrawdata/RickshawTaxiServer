@@ -16,9 +16,10 @@ html
                 script(src='/javascripts/chat.js')
         script.
         
-            // script in this position will run everytime the page is loaded/refreshed
+            // script in this position will run everytime the page is loaded or refreshed
             console.log('\n');
             console.log('Script begins...');
+            
             // declare variables and obtain those passed in
             var participants = !{JSON.stringify(participants)};
             var members = !{JSON.stringify(members)};
@@ -29,14 +30,21 @@ html
             var photoSRC = 'images/noimage.png';
             var user = !{JSON.stringify(user)};
             
+            // *************** FUNCTIONS ***********************
             
+            // This runs when the body has loaded
+            // 1. Create the view buttons if a set of Positions exist
+            // 2. Start the clock function
+            // 3. Start the location service
             function myOnPageLoad() {
                 console.log('Body had loaded..');
+                if (positions.length > 0){
+                    console.log('creating View Buttons...');
+                    createViewButtons();
+                }
                 startTime();
                 console.log('Clock started..');
                 // getLocation();
-                
-            
             }
             
             function startTime(){
@@ -48,6 +56,40 @@ html
                 s = checkTime(s);
                 document.getElementById('clock').innerHTML = h + ":" + m + ":" + s;
                 var t = setTimeout(startTime, 500);
+            }
+            
+            function createViewButtons(){
+                
+                // clear the ViewButton area
+                $('#viewButtons').html('');
+                
+                // append the ViewAll button
+                var html = '<input id="viewAll" type="button" data-id="VIEWALL" value="View All", disabled="true"></input>'; 
+                $('#viewButtons').append(html);
+                
+                // set a function for the ViewAll button click
+                $('#viewAll').on('click', viewAllMarkers);
+                
+                // create and append all the individual View buttons
+                var index = 0;
+                // Loop through Members
+                for (var i = 0; i < members.length; i++) {
+                
+                    // Loop through Positions
+                    for (var p = 0; p < positions.length; p++){
+                    
+                        if (positions[p].memberId === members[i].id){
+                        
+                            console.log('creating a member view button for Member No: ' + members[i].id);
+                            $('#viewButtons').append('<input id="viewButton' + index + '" type="button" value="' + members[i].username + '" data-id="' + members[i].id + '", disabled="true"></input>');
+                            $('#viewButton' + index).on('click', viewMarkersById);
+                            index++;
+                            break;
+                            
+                        }
+                    }
+                }
+                // console.log('chat.js - Participants updated in browser');
             }
             
             function getLocation() {
@@ -121,6 +163,7 @@ html
             }
 
     body(onload="myOnPageLoad()")
+    
         .container
             nav.navbar.navbar-default.navbar-fixed-top
                 .div
@@ -170,12 +213,12 @@ html
                         each participant, i in participants
                             li.alert.alert-danger #{participant.id} , #{participant.username}
                                 
-            if !user
-                p You are NOT logged in
-                
-            if user
-                p UserID: #{user.id} Name: #{user.name} #{user.surname} Username: #{user.username}  AccessLevel: #{user.access} Approval: #{user.isApproved}
-                
+                if !user
+                    p You are NOT logged in
+                    
+                if user
+                    p UserID: #{user.id} Name: #{user.name} #{user.surname} Username: #{user.username}  AccessLevel: #{user.access} Approval: #{user.isApproved}
+                    
         
             block content 1
         

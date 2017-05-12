@@ -1,3 +1,4 @@
+const ID = '(register.js) ';
 var express = require('express');
 var bodyParser = require('body-parser');
 var multer = require('multer');
@@ -12,7 +13,7 @@ module.exports = router;
 
 /* GET - Registration page */
 router.get('/', ensureNotLoggedIn, function(req, res) {
-    console.log('serving the Registration page');
+    console.log(ID + 'serving the Registration page');
     res.render('register', { title: 'Register' });
 });
 
@@ -44,13 +45,19 @@ function ensureNotLoggedIn(req, res, next){
             if Username is duplicate
                 re-render page with a warning
 */
-router.post('/', ensureNotLoggedIn, function(req, res,next){
+
+// Every POST to register.js is checked to ensure the User is NULL (is not logged in)
+// processing of the POST is then passed to the NEXT handler
+router.post('*', ensureNotLoggedIn, function(req, res, next){
+    console.log(ID + 'POST from unknown User (is not logged in)');
+    // Capture all the form values
     return next();
 });
 
+// Registration attempt....
 router.post('/', upload.single('image'), function(req, res){
     // photo has been uploaded to server (may need to delete it later if the registration is incomplete)
-    console.log('Registration Attempted.....');
+    console.log('\t' + ID + 'a registration POST.....');
     // Capture all the form values
     var name = req.body.name;
     var surname = req.body.surname;
@@ -61,17 +68,16 @@ router.post('/', upload.single('image'), function(req, res){
     var telephone = req.body.telephone;
     var pass1 = req.body.password1;
     var pass2 = req.body.password2;
-    var date = new Date();
-    var regDate = date.getTime();
+    var regDate = new Date();
     var lastSeen = regDate;
     var isApproved = 'false';
     var isSuspended = 'false';
+    // this will create a Driver profile
     var access = 10;
     // Check if a file was uploaded
     if(req.file){
         // User supplied a file
-        console.log('   Image supplied by User. Uploading Image....');
-        console.log('       ' + req.file);
+        console.log('\t' + ID + 'Image supplied by User');
         var profileImageOriginalName = req.file.originalname;
         var profileImageName = req.file.filename;
         var profileImageMime = req.file.mimetype;
@@ -80,25 +86,10 @@ router.post('/', upload.single('image'), function(req, res){
         var profileImageSize = req.file.size;
     }
     else {
-        console.log('   No Image supplied or Image too big. Using stock image');
+        console.log('\t' + ID + 'No Image supplied or Image too big. Using stock image');
         var profileImageName = 'noimage.png';
         var profileImageMime = 'image/png';
     }
-    console.log(name);
-    console.log(surname);
-    console.log(nie);
-    console.log(username);
-    console.log(company);
-    console.log(email);
-    console.log(telephone);
-    console.log(pass1);
-    console.log(profileImageName);
-    console.log(regDate);
-    console.log(lastSeen);
-    console.log(isApproved);
-    console.log(isSuspended);
-    console.log(access);
-    console.log(profileImageMime);
     
     // Check form for errors
     req.checkBody('name', 'First Name is required').notEmpty();
@@ -114,13 +105,14 @@ router.post('/', upload.single('image'), function(req, res){
     //req.checkBody('image', 'A photo is required').notEmpty();
     var errors = req.validationErrors();
     if (errors) {
+        
+        console.log('\t' + ID + 'Registration error(s)!!!!!!');
         if(profileImageName !== 'noimage.png'){
             fs.unlink("./public/images/uploads/" + profileImageName, function(err){
                 if(err) return console.log(err);
-                console.log('file deleted successfully');
+                console.log('\t' + ID + 'image file');
             });
         }
-        console.log('   Registration form contained error(s)');
         res.render('register', {
             errors: errors,
             name: name,
@@ -135,19 +127,19 @@ router.post('/', upload.single('image'), function(req, res){
     }
     else {
         // Form data is acceptable, now check for duplicate NIE and Username
-        console.log('   Registration form is COMPLETE');
-        console.log('   Checking for NIE duplication....');
+        console.log('\t' + ID + 'Registration form is COMPLETE');
+        console.log('\t' + ID + 'Checking for NIE duplication....');
         // Check for NIE duplication
         User.NieDuplicated (nie, function(isDupicated) {
             if (isDupicated){
+                console.log('\t' + ID + 'NIE is DUPLICATE!!!');
                 // delete image if uploaded by User
                 if(profileImageName !== 'noimage.png'){
                     fs.unlink("./public/images/uploads/" + profileImageName, function(err){
                         if(err) return console.log(err);
-                        console.log('file deleted successfully');
+                        console.log('\t' + ID + 'file deleted successfully');
                     });
                 }
-                console.log('       match found on NIE');
                 req.flash('failure', 'NIE is already in use on our system');
                 res.render('register', {
                     name: name,
@@ -160,18 +152,18 @@ router.post('/', upload.single('image'), function(req, res){
                 });
             }
             else{
-                console.log('       NIE is UNIQUE');
-                console.log('   Checking for Username duplication....');
+                console.log('\t' + ID + 'NIE is UNIQUE');
+                console.log('\t' + ID + 'Checking for Username duplication....');
                 User.UsernameDuplicated (username, function(isDupicated) {
                     if (isDupicated){
+                        console.log('\t' + ID + 'Username is DUPLICATE');
                         // delete image if uploaded by User
                         if(profileImageName != 'noimage.png'){
                             fs.unlink("./public/images/uploads/" + profileImageName, function(err){
                                 if(err) return console.log(err);
-                                console.log('file deleted successfully');
+                                console.log('\t' + ID + 'file deleted successfully');
                             });
                         }
-                        console.log('       match found on Username');
                         req.flash('failure', 'Username is already in use on our system');
                         res.render('register', {
                             name: name,
@@ -184,20 +176,19 @@ router.post('/', upload.single('image'), function(req, res){
                         });
                     }
                     else{
-                        console.log('       Username is UNIQUE');
-                        console.log('   All post-registration checks COMPLETED');
+                        console.log('\t' + ID + 'Username is UNIQUE');
+                        console.log('\t' + ID + 'All post-registration checks COMPLETED');
                         // all Registration checks passed, save to database 
-                        var newUser = new User("",name, surname, nie, username, company, email, telephone, pass1, profileImageName, regDate, lastSeen, isApproved, isSuspended, access, profileImageMime);
-                        console.log('       saving in database');
-                        console.log(newUser);
+                        var newUser = new User("",name, surname, nie, username, company, email, telephone, pass1, profileImageName, Date.parse(regDate), Date.parse(lastSeen), isApproved, isSuspended, access, profileImageMime);
+                        console.log('\t' + ID + 'saving in database......');
                         // Create User in DB    
                         User.insertUser(newUser, function(err, result){
                             if(err) {
-                                console.log('       Error during INSERT in Members table: ' + err);
+                                console.log('\t' + ID + 'Error during INSERT in Members table: ' + err);
                                 res.redirect('/register');
                                 return;
                             } 
-                            console.log('   New member for Approval added to Members table');
+                            console.log('\t' + ID + 'Registration POST processed, User redirected to Login page');
                             // Success Message
                             req.flash('success', 'You are now registered and may login');
                         
@@ -205,8 +196,11 @@ router.post('/', upload.single('image'), function(req, res){
                             res.redirect('/login');
                         });
                     }
+                    
                 });
             }
+            
         });
     }
+    
 });

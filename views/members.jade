@@ -1,8 +1,13 @@
 extends layout
 
 block content 1
+
+    // A set of TABS containing the Administration Members Views
     .search-tabs-wrapper
+    
+        // Define the TAB list
         ul.nav.nav-tabs(role="tablist")
+            
             li.active
                 a(href="#mapPane" role="tab" data-toggle="tab") Map
             li
@@ -13,73 +18,121 @@ block content 1
                 a(href="#account" role="tab" data-toggle="tab") Account
             li
                 a(href="#members" role="tab" data-toggle="tab") Members
-                
+        
+        // Define the content of all TABS in the above TAB list
         .tab-content.search-tabs-content
+        
+            // Define the MAP content
             .tab-pane.active(id="mapPane")
+                
+                // create the MapView buttons
                 input.btn.btn-success(id='viewLive', type='button', value='LIVE', data-id='viewLive', disabled='true')
                 input.btn.btn-warning(id='viewData', type='button', value='view data', data-id='viewData')
-                #map
-                input.btn.btn-warning(id='viewAll', type='button', value='View All', data-id='VIEWALL', disabled='true')
-                script.
-                    var buttonIndex = 0;
-                each member, i in members
-                    each position, p in positions
-                        if position.memberId === member.id
-                            input.btn.btn-warning(id='viewButton', type='button', value=member.username, data-id=member.id, disabled='true')
-                            script.
-                                $('#viewButton').attr('id', 'viewButton'+buttonIndex);
-                                buttonIndex++;
-                                
-                                console.log('No of buttons '+ buttonIndex);
-                            -break;
                 
-                .modal.fade(id='addMarkerModal', role='dialog')
+                // define the Map space
+                #map
+                
+                // create the time selection controls
+                // NEED TO IMPLEMENT THIS!!!!!!!!!
+                
+                // define the View buttons space
+                #viewButtons
+                
+                // MODAL - ADD A NEW POSITION / MAP MARKER
+                #addMarkerModal.modal.fade(role='dialog')
                     .modal-dialog
                         // Modal content
                         .modal-content
                             .modal-header
                                 button.close(type='button', data-dismiss='modal') ×
                                 h4.modal-title Add a Map Marker
-                            form(method='post', action='/members/addMapMarker')
+                            form(method='post', action='/members/addAPosition')
                                 .modal-body
-                                    input.form-control(id="theId", name='approvalId', type='text', value="approvalId")
-                                    //h5(id="modalId", name="modalId") ID
-                                    p You will add a new Map Marker
+                                    .form-group
+                                        label(for='mmType') Select a Map Marker type:
+                                        select.form-control(id='mmType', name='mmType')
+                                            option(value='way', selected) Way-point
+                                            option(value='rider') Rider
+                                            option(value='customer') Customer
+                                            option(value='location') Location
+                                    .form-group
+                                        label(for='mmMember') Select a MemberID for new Map Marker:
+                                        select.form-control(id='mmMember', name='mmMember')
+                                            each member, i in members
+                                                option(value=member.id, class=(member.id === "45" ? "selected" : "")) #{members[i].username}
+                                            
+                                    .form-group
+                                        label(style='width:100%') Co-ordinates
+                                        input.form-control(id='latitude', type='text', name='latitude', value='', style='width:50%')
+                                        input.form-control(id='longitude', type='text', name='longitude', value='', style='width:50%')
+                                    
+                                    .form-group    
+                                        label(style='width:100%') Date and Time
+                                        input.form-control(id='dateTime', type='text', name='dateTime', value='', style='width:100%')
+                                        
+                                    .form-group
+                                        label(style='width:100%') Visible To Owner
+                                        label.radio-inline
+                                            input.form-control(id='isVisible', type='radio', name='isVisible', checked)
+                                            | Yes
+                                        label.radio-inline
+                                            input.form-control(id='notVisible', type='radio', name='notVisible')
+                                            | No
+                                        
+                                    .form-group    
+                                        label(style='width:100%') Comment
+                                        input.form-control(id='comment', type='text', name='comment', value='', style='width:100%')
+                                    
+                                    
                                 .modal-footer
                                     button.btn.btn-default(type='button', data-dismiss='modal') Cancel            
-                                    input.btn.btn-warning(name='submit', type='submit', value='Add Marker')
+                                    // create the Add Map Marker button
+                                    input.btn.btn-warning(name='submit', type='submit', value='Add Map Marker')                   
                 
+                // ******************** MAP TAB SCRIPT HERE *********************    
                 script.
+                    
+                    $('#viewLive').attr('disabled',true);
+                    
+                    // acquire MAP TAB variables
+                    
                     var barcelona = null;
                     var map = null;
                     var markers = [];
                     var modal = document.getElementById('addMarkerModal');
                     var trackingMarkers = [];
                     
+                    // MAP TAB functions
+                    
+                    // Initiate map
+                    
                     function initMaps() {
+                    
                         barcelona = {lat: 41.398, lng: 2.158};
                         map = new google.maps.Map(document.getElementById('map'), {
                             zoom: 15,
                             center: barcelona
                         });
-                        // This event listener will call addMarker() when the map is clicked.
+                        // add event listener to the Map ( to modal)
                         map.addListener('click', function(event) {
+                            $('#addMarkerModal').modal('show');
                             var now = new Date();
-                            var day = now.getDay();
-                            var month = now.getMonth();
-                            var year = now.getYear();
-                            var date = now.getDate();
-                            console.log(now);
-                            console.log(day);
-                            console.log(month);
-                            console.log(year);
-                            console.log(date);
-                            
-                            modal.style.display = 'block';
+                            var position = event.latLng;
+                            var lat = position.lat;
+                            var lng = position.lng;
+                            console.log(lat);
+                            console.log(lng);
+                            $(".modal-body #latitude").val(lat);
+                            $(".modal-body #longitude").val(lng);
+                            $(".modal-body #dateTime").val(now);
                             // addMarker(event.latLng);
                         });
-                        if(!$('#viewLive').attr('disabled')){
+                        
+                        if($('#viewData').attr('disabled')){
                             createTrackingMarkers();
+                        }
+                        else{
+                            // enable live data
                         }
                         
                     }
@@ -94,7 +147,7 @@ block content 1
                         createTrackingMarkers();
                     }
                     
-                    $('#viewAll').on('click', viewAllMarkers);
+                    // $('#viewAll').on('click', viewAllMarkers);
                     
                     function viewMarkersById(){
                         var theID = $(this).data('id');
@@ -105,25 +158,27 @@ block content 1
                         createTheseTrackingMarkers(theID);
                     }
                     
-                    for (i = 0; i < buttonIndex; i++){
-                        console.log('viewButton'+i);
-                        $('#viewButton' + i).on('click', viewMarkersById);
-                    }
+                    // for (i = 0; i < buttonIndex; i++){
+                    //      console.log('viewButton'+i);
+                    //      $('#viewButton' + i).on('click', viewMarkersById);
+                    // }
                     
                     function createTrackingMarkers(){
+                        trackingMarkers = [];
                         var trackingBounds = new google.maps.LatLngBounds();
                         console.log('There are ' + positions.length + ' markers to be created');
+                        
+                        
                         for(i = 0; i < positions.length; i++){
-                            if (positions[i].lat != null && positions[i].lng != null){
-                                console.log('making a marker...');
-                                var aLatLng = new google.maps.LatLng(positions[i].lat, positions[i].lng);
-                                trackingMarkers[i] = new google.maps.Marker({
-                                    position: aLatLng, 
-                                    map: map
-                                });
-                                trackingBounds.extend(aLatLng);
-                                console.log(positions[i].name);
-                            }
+                            console.log('making a marker...');
+                            var aLatLng = new google.maps.LatLng(positions[i].lat, positions[i].lng);
+                            trackingMarkers[i] = new google.maps.Marker({
+                                position: aLatLng, 
+                                map: map
+                            });
+                            trackingBounds.extend(aLatLng);
+                            console.log(positions[i].memberId);
+                            
                             
                         }
                         map.fitBounds(trackingBounds);
@@ -153,13 +208,14 @@ block content 1
                     
                         // enable/disable buttons
                         $('#viewLive').attr('disabled',false);
-                        $('#viewAll').attr('disabled',false);
                         $('#viewData').attr('disabled','true');
+                        
+                        $('#viewAll').attr('disabled',true);
+                        
                         var index = 0;
                         var moreButtons = true;
                         while (moreButtons){
                             var exists = document.getElementById('viewButton'+index);
-                            console.log(exists);
                             if(exists){
                                 $('#viewButton'+index).attr('disabled',false);
                                 index++;
@@ -169,7 +225,6 @@ block content 1
                             }
                         }
                         createTrackingMarkers();
-                        
                     }
                     
                     $('#viewData').on('click', viewData);
@@ -201,12 +256,15 @@ block content 1
                     }
                     $('#viewLive').on('click', viewLive);
                     
-                    // Sets the map on all markers in the array.
+                    // Sets the map on all markers in the array
                     function setMapOnAll(map){
+                        console.log(trackingMarkers.length + ' tracking markers');
                         for (var i = 0; i < trackingMarkers.length; i++){
+                            console.log(i);
                             trackingMarkers[i].setMap(map);
                         }
                     }
+                    
 
                     
             .tab-pane(id="chat")

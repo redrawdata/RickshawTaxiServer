@@ -39,12 +39,11 @@ module.exports.comparePassword = function (candidatePassword, hash, callback){
 
 module.exports.insertUser = function (newUser, callback){
     var newUser = newUser;
-    console.log(newUser);
     //create the connection to the database, then process the error or returned client
     pg.defaults.ssl = true;
     pg.connect(connect, function(error, client, done) {
         if (error) {
-            console.log('!!! error trying to connnect to database !!!');
+            console.log('\t' + ID + '!!! error trying to connnect to database !!!');
             return callback(error);
         }
         // hash the password
@@ -56,7 +55,7 @@ module.exports.insertUser = function (newUser, callback){
                     if (err){
                         return callback(err);
                     }
-                    console.log('new Member added to database');
+                    console.log('\t' + ID + 'new Member added to database');
                     return callback(null, result);
                 });
             });
@@ -203,7 +202,7 @@ module.exports.getUserByUsername = function (username, callback){
 
 // returns all Member record(s)
 module.exports.getAllMembers = function (allMembers, callback){
-    console.log('\t\t'+ID+'refreshing Members.....');
+    console.log('\t\t' + ID + 'refreshing Members.....');
     pg.defaults.ssl = true;
     pg.connect(connect, function(error, client, done) {
         if (error) {
@@ -239,14 +238,14 @@ module.exports.getAllMembers = function (allMembers, callback){
                         email:          membersSet[i].email, 
                         telephone:      membersSet[i].telephone,  
                         image:          membersSet[i].image, 
-                        regDate:        membersSet[i].regdate,  
-                        lastSeen:       membersSet[i].lastseen, 
+                        regDate:        new Date(membersSet[i].regdate),  
+                        lastSeen:       new Date(membersSet[i].lastseen), 
                         isApproved:     membersSet[i].isapproved, 
                         isSuspended:    membersSet[i].issuspended,  
                         access:         membersSet[i].access
                         
                     });
-                    //console.log(members[i].username);
+                    //console.log(members[i].regDate);
                 }
                 console.log("\t\t\t"+ ID+ members.length + " Members in DB");
             
@@ -258,36 +257,36 @@ module.exports.getAllMembers = function (allMembers, callback){
 };
 
 module.exports.getUserById = function (id, callback){
-    console.log('Retrieving User by ID, connecting.....');
+    console.log('\t' + ID + 'Retrieving User by ID, connecting.....');
     pg.defaults.ssl = true;
     pg.connect(connect, function(error, client, done) {
         if (error) {
-            console.log("   error during DB connection");
+            console.log('\t' + ID + 'error during DB connection');
             return callback(error);
         }
-        console.log('   connected - querying database');
+        //console.log('   connected - querying database');
         var sql = "(SELECT * FROM public.members WHERE memberno = '" + id + "')";
         client.query(sql, function(err, result){
             done();
             if(err){
-                console.log("   error during DB query");
+                console.log('\t' + ID + 'error during DB query');
             return callback(err);
             }
             if (result.rowCount == 0){
-                console.log("   no match found for memberID");
+                console.log('\t' + ID + 'no match found for memberID');
             return callback(null, null);
             }
             if (result.rowCount == 1){
-                console.log("   1 match found");
+                //console.log("   1 match found");
             
                 var userSet = JSON.stringify(result.rows, null, '    ');
                 userSet = JSON.parse(userSet);
                 var user = new User(userSet[0].memberno, userSet[0].name,  userSet[0].surname, userSet[0].nie, userSet[0].username,  userSet[0].company, userSet[0].email, userSet[0].telephone,  userSet[0].password, userSet[0].image, userSet[0].regdate,  userSet[0].lastseen, userSet[0].isapproved, userSet[0].issuspended,  userSet[0].access, userSet[0].mime);
-                console.log(user);
+                //console.log(user);
                 return callback(null, user);
             }
             // THIS SHOULD NOT HAPPEN - THERE IS USERNAME DUPLICATION
-            console.log('DB error - duplication in MemberID field');
+            console.log('\t' + ID + 'DB error - duplication in MemberID field');
             return callback(null, null);
         });
     });    
