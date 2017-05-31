@@ -129,7 +129,7 @@ router.post('/positions', function(req, res){
 });
 
 /* POST - Admin is creating a Map Marker */
-router.post('/addAPosition', function(req, res){
+router.post('/addAPosition', ensureAuthenticated, function(req, res){
     console.log(ID + 'Admin submits a position...');
     var id = "";
     console.log(id);
@@ -154,11 +154,9 @@ router.post('/addAPosition', function(req, res){
     Position.addAPosition(newPosition, function(err, result){
         if (err){
             console.log('Error while adding new Position: ' + err);
-            res.send('200');
         }
-        else{
-            res.redirect('/members');
-        }
+        res.redirect('/members');
+        
     });
     
     

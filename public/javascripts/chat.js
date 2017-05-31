@@ -61,7 +61,7 @@ function init() {
         console.log('chat.js - updating Participants');
         updateParticipants(data.participants);
         // run test function
-        addMarkers(data.participants);
+        displayTheseMarkers(data.participants);
         
         
     });
@@ -89,7 +89,7 @@ function init() {
     */
     socket.on('incomingCoords', function (data) {
         console.log('new set of member coords received');
-        adjustMarkers(data.participants);
+        refreshParticipants(data.participants);
         //$('#messages').prepend('<b>' + name + '</b><br />' + message + '<hr />');
     });
 

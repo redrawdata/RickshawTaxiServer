@@ -6,7 +6,7 @@ block content 1
     .search-tabs-wrapper
     
         // Define the TAB list
-        ul.nav.nav-tabs(role="tablist")
+        ul.nav.nav-tabs(id='memberTabs', role="tablist")
             
             li.active
                 a(href="#mapPane" role="tab" data-toggle="tab") Map
@@ -21,22 +21,30 @@ block content 1
         
         // Define the content of all TABS in the above TAB list
         .tab-content.search-tabs-content
-        
+            
+            script.
+                console.log("creating map tab...");
+            
             // Define the MAP content
             .tab-pane.active(id="mapPane")
-                
-                // create the MapView buttons
-                input.btn.btn-success(id='viewLive', type='button', value='LIVE', data-id='viewLive', disabled='true')
-                input.btn.btn-warning(id='viewData', type='button', value='view data', data-id='viewData')
-                
+                .div(id='mapViewDiv', style='margin:10px')
+                    // create the viewLive, viewData and map Lock buttons
+                    input.btn.btn-success(id='viewLive', type='button', value='LIVE', data-id='viewLive', disabled='true', style='font-size:10px')
+                    
+                    input.btn.btn-warning(id='viewData', type='button', value='view data', data-id='viewData', style='font-size:10px')
+                    
+                    input.btn.btn-info(id='mapLock', type='button', value='LOCKED', data-id='mapLock', style='float:right;font-size:10px')
+                    
                 // define the Map space
-                #map
+                .div(id='mapDiv', style='border:2px black')
+                    #map
                 
                 // create the time selection controls
                 // NEED TO IMPLEMENT THIS!!!!!!!!!
                 
                 // define the View buttons space
-                #viewButtons
+                
+                #viewButtons(style='margin:10px')
                 
                 // MODAL - ADD A NEW POSITION / MAP MARKER
                 #addMarkerModal.modal.fade(role='dialog')
@@ -91,8 +99,6 @@ block content 1
                 
                 // ******************** MAP TAB SCRIPT HERE *********************    
                 script.
-                    
-                    $('#viewLive').attr('disabled',true);
                     
                     // acquire MAP TAB variables
                     
@@ -184,6 +190,35 @@ block content 1
                         map.fitBounds(trackingBounds);
                     }
                     
+                    function refreshParticipants(updatedParticipants){
+                        console.log('participants refreshed');
+                        participants = updatedParticipants;
+                        if(document.getElementById('viewLive').disabled){
+                        
+                            displayTheseMarkers(participants);
+                        }
+                    }
+                    
+                    function displayTheseMarkers(someMarkers){
+                        console.log('displaying new set of marker....');
+                        //clear the map
+                        setMapOnAll(null);
+                        var trackingBounds = new google.maps.LatLngBounds();
+                        console.log(someMarkers.length + ' markers to create');
+                        for(i = 0; i < someMarkers.length; i++){
+                            var aLatLng = new google.maps.LatLng(someMarkers[i].lat, someMarkers[i].lng);
+                            trackingMarkers[i] = new google.maps.Marker({
+                                    position: aLatLng, 
+                                    map: map
+                                });
+                            trackingBounds.extend(aLatLng);
+                                
+                            
+                            
+                        }
+                        map.fitBounds(trackingBounds);
+                    }
+                    
                     function createTheseTrackingMarkers(memberID){
                         var trackingBounds = new google.maps.LatLngBounds();
                         console.log('There are ' + positions.length + ' markers to be created');
@@ -227,7 +262,6 @@ block content 1
                         createTrackingMarkers();
                     }
                     
-                    $('#viewData').on('click', viewData);
                     
                     function viewLive(){
                     
@@ -254,7 +288,6 @@ block content 1
                         }
                     
                     }
-                    $('#viewLive').on('click', viewLive);
                     
                     // Sets the map on all markers in the array
                     function setMapOnAll(map){
@@ -266,32 +299,51 @@ block content 1
                     }
                     
 
+                    $('#viewLive').attr('disabled',true);
+                    $('#viewData').on('click', viewData);
+                    $('#viewLive').on('click', viewLive);
                     
+                    
+            
+            script.
+                console.log("creating chat tab...");
+            
+            
+            
+            
+            
+            
+            
+            
             .tab-pane(id="chat")
-                span Your name:
-                    input(type="text", value="#{user.username}")#name
-                .row
-                    .col-xs-9
-                        .div(id="chatMessages")
-                            #messages
-                    .col-xs-3
-                        .div(id="chatParticipants")
-                            b Participants
-                            #participants
-                .row
-                    form#messageForm
+                //-
+                    span Your name:
+                        input(type="text", value="#{user.username}")#name
+                .div
+                    .row
                         .col-xs-9
-                            .div(id="chatOut")
-                                input("text",placeholder="Share something!", maxlength=256)#outgoingMessage
+                            .div(id="chatMessages")
+                                #messages
                         .col-xs-3
-                            .div(id="sendButton")
-                                input(type="button", value="Share", disabled=true)#send
-            
+                            .div(id="chatParticipants")
+                                b Participants
+                                #participants
+                    .row
+                        form#messageForm
+                            .col-xs-9
+                                .div(id="chatOut")
+                                    input("text",placeholder="Share something!", maxlength=256)#outgoingMessage
+                            .col-xs-3
+                                .div(id="sendButton")
+                                    input(type="button", value="Share", disabled=true)#send
+                
                         
                         
                 
                 
             
+            script.
+                console.log("creating profile tab...");
             
             .tab-pane(id="profile")
                 h1 My Profile - #{user.username}
@@ -328,45 +380,11 @@ block content 1
                             .form-group
                                 label Email
                                 input.form-control(name='email', type='text', value=user.email)
-                        //-
-                            span
-                                input.btn.btn-default(name='submit', type='submit', value='Approve Membership')#approve
-                                span(type="text", value="    ")
-                                span(type="text", value="    ")
-                                span
-                                    input.btn.btn-default(name='first', type='submit', value='<<')#firstMember
-                                span
-                                    input.btn.btn-default(name='previous', type='submit', value='<')#approvalsPrevious
-                                span
-                                    input.btn.btn-default(name='next', type='submit', value='>')#approvalsNext
-                                span
-                                    input.btn.btn-default(name='last', type='submit', value='>>')#approvalsLast
-                    
-                // set the photo and populate the form
-                script.
-                    console.log("setting up the form");
-                    $("#photo").attr("src", "images/app1.jpg");
-                    console.log("image set");
-                    // set the name
-                    $("#approvalName").attr("value", members[index].name);
-                    $("#approvalSurname").attr("value", members[index].surname);
-                    $("#approvalNie").attr("value", members[index].nie);
-                    $("#approvalUsername").attr("value", members[index].username);
-                    $("#approvalCompany").attr("value", members[index].company);
-                    $("#approvalEmail").attr("value", members[index].email);
-                    $("#approvalTelephone").attr("value", members[index].telephone);
-                    // loop through Members....
-                    while (index < members.length){
-                        // if the Member is not approved....
-                        if(members[index].isapproved == false){
-                            // set the src of the photo
-                            
-                            break;
-                        }
-                        console.log(members[index].username + " is approved....skipping...");
-                        index++;
-                    }
+                        
                 
+            script.
+                console.log("creating account tab...");
+            
             .tab-pane(id="account")
                 h1 My Account
                 .panel.panel-primary
@@ -388,6 +406,12 @@ block content 1
                 div
                     p Option 3
                     
+            
+            
+            
+            script.
+                console.log("creating members tab...");
+            
             .tab-pane(id="members")
             
                 h1 Member Profiles

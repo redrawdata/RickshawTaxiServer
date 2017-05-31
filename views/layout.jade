@@ -12,7 +12,7 @@ html
         script(src='//code.jquery.com/jquery-1.11.0.min.js')
         script(src='/socket.io/socket.io.js')
         if user
-            if user.isapproved  
+            if user.isApproved  
                 script(src='/javascripts/chat.js')
         script.
         
@@ -29,6 +29,7 @@ html
             var buttonIndex = 0;
             var photoSRC = 'images/noimage.png';
             var user = !{JSON.stringify(user)};
+            console.log('Variables declared');
             
             // *************** FUNCTIONS ***********************
             
@@ -36,6 +37,7 @@ html
             // 1. Create the view buttons if a set of Positions exist
             // 2. Start the clock function
             // 3. Start the location service
+            
             function myOnPageLoad() {
                 console.log('Body had loaded..');
                 if (positions.length > 0){
@@ -44,9 +46,22 @@ html
                 }
                 startTime();
                 console.log('Clock started..');
-                // getLocation();
+                if(user){
+                    startLocationService();
+                    console.log('LocSer started');
+                }
+                //getLocation();
             }
             
+            function startLocationService(){
+                autoUpdateLocation();
+            }
+            
+            function autoUpdateLocation(){
+                // get current location
+                getLocation();
+                var repeat = setTimeout(autoUpdateLocation, 5000);
+            }
             function startTime(){
                 var today = new Date();
                 var h = today.getHours();
@@ -64,7 +79,7 @@ html
                 $('#viewButtons').html('');
                 
                 // append the ViewAll button
-                var html = '<input id="viewAll" type="button" data-id="VIEWALL" value="View All", disabled="true"></input>'; 
+                var html = '<input id="viewAll" type="button" data-id="VIEWALL" value="View All", disabled="true", style="font-size:10px"></input>'; 
                 $('#viewButtons').append(html);
                 
                 // set a function for the ViewAll button click
@@ -81,7 +96,7 @@ html
                         if (positions[p].memberId === members[i].id){
                         
                             console.log('creating a member view button for Member No: ' + members[i].id);
-                            $('#viewButtons').append('<input id="viewButton' + index + '" type="button" value="' + members[i].username + '" data-id="' + members[i].id + '", disabled="true"></input>');
+                            $('#viewButtons').append('<input id="viewButton' + index + '" type="button" value="' + members[i].username + '" data-id="' + members[i].id + '", disabled="true", style="font-size:10px"></input>');
                             $('#viewButton' + index).on('click', viewMarkersById);
                             index++;
                             break;
@@ -96,14 +111,14 @@ html
                 
                 console.log("fetching location...");
                 if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(showPosition, showError);
+                    navigator.geolocation.getCurrentPosition(postLocation, showError);
                 } 
                 else { 
                     x.innerHTML = "Geolocation is not supported by this browser.";
                 }
             }
 
-            function showPosition(position) {
+            function postLocation(position) {
                 var x = document.getElementById("lat/lng");
                 x.innerHTML = "Latitude: " + position.coords.latitude + 
                 " Longitude: " + position.coords.longitude;
@@ -119,6 +134,7 @@ html
                     );
                 }
                 else{
+                    // AJAXing to the server
                     $.ajax({
                         url:  '/coords',
                         type: 'POST',
@@ -161,6 +177,7 @@ html
                 if (i < 10) {i = "0" + i};  // add zero in front of numbers < 10
                 return i;
             }
+            console.log('loading body....');
 
     body(onload="myOnPageLoad()")
     
@@ -202,7 +219,8 @@ html
                                 li
                                     a(href="/members/logout") Log Out
             
-            
+            script.
+                console.log('navbar complete');
             //- 
                 if messages
                     != messages()

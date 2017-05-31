@@ -217,7 +217,7 @@ function addFakeParticipants(){
 members
 //POST method to create a chat message
 app.post("/message", function(request, response) {
-    console.log('POST to /message - app.js');
+    console.log(ID + 'POST to /message');
     //The request body expects a param named "message"
     var message = request.body.message;
         console.log(message);
@@ -237,15 +237,21 @@ app.post("/message", function(request, response) {
 
 //POST method to receive member Coordinates
 app.post("/coords", function(request, response) {
-    console.log(ID + 'POST to /coords....');
+    console.log(ID + 'POST to /coords');
     //The request body expects a param named "lat", "lng" and "id"
     var lat = request.body.lat;
     var lng = request.body.lng;
     var id = request.body.id;
-        //console.log(message);
+    console.log(id);
+    console.log(lat);
+    console.log(lng);
+    console.log(participants.length + ' online');
+    for (i = 0; i < participants.length; i++){
+        console.log(participants[i].id + '\t' + participants[i].memberID + '\t' + participants[i].name);
+    }
     // update the Participant[id] lat and lng
     for (i = 0; i < participants.length; i++){
-        console.log('Participant ' + i + ' ID:' + participants[i].memberID + '('+id+')');A
+        console.log('Participant ' + i + ' ID:' + participants[i].memberID + '('+id+')');
         if(participants[i].memberID == id){
             participants[i].lat=lat;
             participants[i].lng=lng;
@@ -253,6 +259,7 @@ app.post("/coords", function(request, response) {
         }
         
     }
+    
     //Emit the new coords to all Participants (.sockets)
     io.sockets.emit("incomingCoords", {participants: participants});
     //Looks good, let the client know
