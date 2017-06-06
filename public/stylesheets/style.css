@@ -150,7 +150,8 @@ text-align:left;
 
 .row {
     width:100%;
-    padding:0px
+    padding:5px;
+    margin:0px
 }
 #chatParticipants{
     font-size:10px;
@@ -184,7 +185,12 @@ img.media-object{
     max-width:75px;
     
 }
-
+.nav > li > a {
+    padding-top: 7px;
+    padding-right: 10px;
+    padding-bottom: 7px;
+    padding-left: 10px;
+}
 footer{
     background:#f4f4f4;
     height:auto;

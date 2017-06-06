@@ -117,10 +117,14 @@ block content 1
                         barcelona = {lat: 41.398, lng: 2.158};
                         map = new google.maps.Map(document.getElementById('map'), {
                             zoom: 15,
-                            center: barcelona
+                            center: barcelona,
+                            disableDefaultUI: true,
+                            tilt: 45,
+                            heading:180
+
                         });
                         // add event listener to the Map ( to modal)
-                        map.addListener('click', function(event) {
+                        map.addListener('dblclick', function(event) {
                             $('#addMarkerModal').modal('show');
                             var now = new Date();
                             var position = event.latLng;
@@ -429,12 +433,12 @@ block content 1
                 each member, i in members
                     .panel(id="memberprofilecontainer"+member.id ,style="background-color:white")
                         .row
-                            .col-md-4
+                            .col-xs-4
                                 h5 ID No. #{member.id}
                                 h5(id="memberrole"+member.id) Role
                                 img.media-object(src='images/uploads/'+member.image)
                                 h5 #{member.company}
-                            .col-md-5
+                            .col-xs-5
                                 h6 #{member.username}
                                 h6 #{member.name} #{member.surname}
                                 h6 #{member.nie}
@@ -443,7 +447,7 @@ block content 1
                                 h6 Registered/Approved: #{member.regDate}
                                 h6 Last Seen: #{member.lastSeen}
                                 
-                            .col-md-3
+                            .col-xs-3
                                 // The Edit button
                                 .btn.btn-warning(id="edit"+member.id, type='button', style="width:100%") Edit...
                                 
