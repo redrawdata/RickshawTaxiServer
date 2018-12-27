@@ -1,6 +1,6 @@
 const ID = '(user.js) ';
 var pg = require('pg');
-var bcrypt = require('bcrypt');
+var bcrypt = require('bcryptjs');
 const saltRounds = 10;
 const myPassword = 'the quick brown fox';
 const anotherPassword = 'secretsquirrel';
